@@ -97,9 +97,9 @@ class RandomAgent:
         self.update_epsilon()
 
     def load(self, name):
-        if model:
+        if self.model:
             self.model.load_weights(name)
 
     def save(self, name):
-        if model:
+        if self.model:
             self.model.save_weights(name)

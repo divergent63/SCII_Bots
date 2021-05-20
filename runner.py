@@ -56,6 +56,12 @@ _MOVE = actions.FUNCTIONS.Scan_Move_screen.id
 _MOVE_SCREEN = actions.FUNCTIONS.Attack_screen.id
 # _MOVE_SCREEN = actions.FUNCTIONS.Attack_unit.id
 _SELECT_ARMY = actions.FUNCTIONS.select_army.id
+# _ATTACK_MINIMAP = actions.FUNCTIONS.Attack_Attack_minimap.id
+_ATTACK_MINIMAP = actions.FUNCTIONS.Attack_minimap.id
+
+army_selected = False
+army_rallied = False
+
 _SELECT_IDLE_WORKER = actions.FUNCTIONS.select_idle_worker.id
 _TRAIN_SCV = actions.FUNCTIONS.Train_SCV_quick.id
 
@@ -63,8 +69,6 @@ _SELECT_POINT = actions.FUNCTIONS.select_point.id
 _BUILD_SUPPLY_DEPOT = actions.FUNCTIONS.Build_SupplyDepot_screen.id
 _BUILD_BARRACKS = actions.FUNCTIONS.Build_Barracks_screen.id
 _TRAIN_MARINE = actions.FUNCTIONS.Train_Marine_quick.id
-# _ATTACK_MINIMAP = actions.FUNCTIONS.Attack_Attack_minimap.id
-_ATTACK_MINIMAP = actions.FUNCTIONS.Attack_minimap.id
 
 _COLLECT_RESOURCES = actions.FUNCTIONS.Harvest_Gather_SCV_screen.id
 _BUILD_MISSLE_TURRENT = actions.FUNCTIONS.Build_MissileTurret_screen.id
@@ -147,8 +151,8 @@ ensure_available_actions = True
 disable_fog = True
 
 steps_per_episode = 0   # 0 actually means unlimited
-MAX_EPISODES = 5
-MAX_STEPS = 500
+MAX_EPISODES = 50
+MAX_STEPS = 50000
 steps = 0
 
 # run trajectories and train
