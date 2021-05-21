@@ -22,7 +22,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/random_agent.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="704">
+            <state relative-caret-position="2128">
               <caret line="112" column="54" selection-start-line="112" selection-start-column="54" selection-end-line="112" selection-end-column="54" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
@@ -34,7 +34,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/runner.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="332">
+            <state relative-caret-position="3952">
               <caret line="208" column="24" selection-start-line="208" selection-end-line="209" />
               <folding>
                 <element signature="e#0#46#0" expanded="true" />
@@ -58,7 +58,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone/Lib/site-packages/pysc2/lib/remote_controller.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="540">
+            <state relative-caret-position="3059">
               <caret line="179" selection-start-line="179" selection-end-line="179" />
             </state>
           </provider>
@@ -67,7 +67,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/utils.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="426">
+            <state relative-caret-position="3154">
               <caret line="166" column="5" selection-start-line="166" selection-start-column="5" selection-end-line="166" selection-end-column="5" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
@@ -79,7 +79,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/network.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="198">
+            <state relative-caret-position="4104">
               <caret line="232" column="105" selection-start-line="232" selection-start-column="105" selection-end-line="232" selection-end-column="105" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
@@ -91,7 +91,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone/Lib/site-packages/torch/nn/modules/pooling.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-543">
+            <state relative-caret-position="1349">
               <caret line="78" column="6" selection-start-line="78" selection-start-column="6" selection-end-line="78" selection-end-column="6" />
             </state>
           </provider>
@@ -100,7 +100,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone/Lib/site-packages/torch/nn/functional.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="198">
+            <state relative-caret-position="25783">
               <caret line="1370" selection-start-line="1370" selection-end-line="1370" />
             </state>
           </provider>
@@ -109,7 +109,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone/Lib/site-packages/torch/nn/modules/module.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="361">
+            <state relative-caret-position="11077">
               <caret line="590" selection-start-line="590" selection-end-line="590" />
             </state>
           </provider>
@@ -182,6 +182,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -197,12 +198,11 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../courses/pytorch/pytorch_example_study" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
@@ -306,17 +306,17 @@
       <updated>1621414553600</updated>
       <workItem from="1621414556516" duration="17579000" />
       <workItem from="1621492810598" duration="38109000" />
+      <workItem from="1621619754968" duration="32000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="55688000" />
+    <option name="totallyTimeSpent" value="55720000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="2062" height="1166" extended-state="6" />
-    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.1017964" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.10279441" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -579,13 +579,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone/Lib/site-packages/torch/nn/modules/pooling.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-543">
-          <caret line="78" column="6" selection-start-line="78" selection-start-column="6" selection-end-line="78" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone/Lib/site-packages/torch/nn/modules/conv.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="198">
@@ -593,23 +586,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone/Lib/site-packages/pysc2/lib/remote_controller.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="540">
-          <caret line="179" selection-start-line="179" selection-end-line="179" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone/Lib/site-packages/torch/nn/functional.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="198">
-          <caret line="1370" selection-start-line="1370" selection-end-line="1370" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/random_agent.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="704">
+        <state relative-caret-position="2128">
           <caret line="112" column="54" selection-start-line="112" selection-start-column="54" selection-end-line="112" selection-end-column="54" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
@@ -619,7 +598,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/runner.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="332">
+        <state relative-caret-position="3952">
           <caret line="208" column="24" selection-start-line="208" selection-end-line="209" />
           <folding>
             <element signature="e#0#46#0" expanded="true" />
@@ -627,19 +606,16 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/network.py">
+    <entry file="file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone/Lib/site-packages/pysc2/lib/remote_controller.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="198">
-          <caret line="232" column="105" selection-start-line="232" selection-start-column="105" selection-end-line="232" selection-end-column="105" />
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="3059">
+          <caret line="179" selection-start-line="179" selection-end-line="179" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/utils.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="426">
+        <state relative-caret-position="3154">
           <caret line="166" column="5" selection-start-line="166" selection-start-column="5" selection-end-line="166" selection-end-column="5" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
@@ -647,9 +623,33 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/network.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="4104">
+          <caret line="232" column="105" selection-start-line="232" selection-start-column="105" selection-end-line="232" selection-end-column="105" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone/Lib/site-packages/torch/nn/modules/pooling.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1349">
+          <caret line="78" column="6" selection-start-line="78" selection-start-column="6" selection-end-line="78" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone/Lib/site-packages/torch/nn/functional.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="25783">
+          <caret line="1370" selection-start-line="1370" selection-end-line="1370" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone/Lib/site-packages/torch/nn/modules/module.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="361">
+        <state relative-caret-position="11077">
           <caret line="590" selection-start-line="590" selection-end-line="590" />
         </state>
       </provider>
