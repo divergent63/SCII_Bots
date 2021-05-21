@@ -19,9 +19,13 @@ import os, sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
 from random_agent import RandomAgent
-# from network import FullyConv
+# from network import FullyConv, 
+from network import SimpleConvNet
+
 from utils import get_state, get_action_v2
 import numpy as np
+
+import torch
 
 seed = 500
 np.random.seed(seed)
@@ -123,12 +127,12 @@ spatial_actions = [_MOVE_SCREEN]
 
 id_from_actions = {}
 action_from_id = {}
-for ix, k in enumerate(spatial_actions):
-    id_from_actions[k] = ix
-    action_from_id[ix] = k
+# for ix, k in enumerate(spatial_actions):
+#     id_from_actions[k] = ix
+#     action_from_id[ix] = k
 for ix, k in enumerate(categorical_actions):
-    id_from_actions[k] = ix+len(spatial_actions)
-    action_from_id[ix+len(spatial_actions)] = k
+    id_from_actions[k] = ix+len(categorical_actions)
+    action_from_id[ix+len(categorical_actions)] = k
 
 # initialize NN model hyperparameters
 eta = 0.1
@@ -136,7 +140,13 @@ expl_rate = 0.2
 
 # initialize model object
 # model = FullyConv(eta, expl_rate, categorical_actions,spatial_actions)
-model = None
+
+# <obs[0].observation.feature_screen.shape(1) = 27> + <obs[0].observation.feature_screen.shape(1) = 11> = 38
+model = SimpleConvNet(in_channels=38, out_channels=[len(categorical_actions), 4096])
+model = model.cuda() if torch.cuda.is_available() else model
+
+# model = None
+print(model)
 
 # initalize Agent
 agent = RandomAgent(model, categorical_actions, spatial_actions, id_from_actions, action_from_id)
@@ -152,15 +162,15 @@ disable_fog = True
 
 steps_per_episode = 0   # 0 actually means unlimited
 MAX_EPISODES = 2
-MAX_STEPS = 50
+MAX_STEPS = 300
 steps = 0
 
 # run trajectories and train
 with sc2_env.SC2Env(
         map_name="Simple64",
         players=[sc2_env.Agent(sc2_env.Race.terran),
-                 # sc2_env.Bot(sc2_env.Race.protoss, sc2_env.Difficulty.very_easy)
-                 sc2_env.Bot(sc2_env.Race.terran, sc2_env.Difficulty.easy)
+                 sc2_env.Bot(sc2_env.Race.protoss, sc2_env.Difficulty.very_easy)
+                 # sc2_env.Bot(sc2_env.Race.protoss, sc2_env.Difficulty.easy)
                  ],
         visualize=viz, agent_interface_format=sc2_env.AgentInterfaceFormat(
         feature_dimensions=sc2_env.Dimensions(
@@ -173,7 +183,7 @@ with sc2_env.SC2Env(
         disable_fog=disable_fog
 ) as env:
     if model and Path(Path(os.getcwd()) / 'save' / 'Simple64-a2c.h5').is_file():
-        agent.load("./save/Simple64-a2c.h5")
+        agent.load("./save/Simple64-rand.pt")
 
     done = False
     history = []
@@ -192,7 +202,8 @@ with sc2_env.SC2Env(
             if e == 0 and time == 0:
                 init = True
 
-            a, point = agent.act_randomly()
+            state_model = [obs[0].observation.feature_screen, obs[0].observation.feature_minimap, obs[0].observation.player]
+            a, point = agent.act(state_model, init)
 
             func, act_a = get_action_v2(a, point, obs=obs[0])
             next_obs = env.step([func])
@@ -202,31 +213,48 @@ with sc2_env.SC2Env(
 
             reward = float(next_obs[0].reward) + float(np.sum(next_obs[0].observation.score_cumulative)) * 10e-8
 
-            if env._controllers and env._controllers[0].status.value != 3:
+            if env._controllers and env._controllers[0].status.value != 3:          # env._controllers[0].status.value = 3 --> game running; env._controllers[0].status.value = 5 --> defeat;
                 done = True
+                if env._controllers[0].status.value == 5:           # 战败
+                    reward = reward / 1000
+                break
             if time == MAX_STEPS-1:
                 done = True
-            # done = next_obs[0].last()
-            
-            agent.append_sample(state, act_a, point, reward, score)
+            # if next_obs[0].last():
+            #     done = True
+            # if not next_obs[0].last():              #
+            #     done = True
+
+            history.append(agent.append_sample(state_model, act_a, point, reward, score))
             state = next_state
             obs = next_obs
             if done:
                 print("episode: {}/{}, score: {}".format(e, MAX_EPISODES, score))
                 if score_pre < score:
                     score_pre = score
-
                 done = False
 
-            if time % 10 == 0:
-                if score_pre < score:
-                    # save agent model
-                    history.append(
-                        [e, time, state, next_state, act_a, reward, score, done]
-                    )
-
             score += reward
-
             time += 1
-    history_arr = np.array(history)
-    # np.savez_compressed('history_random.npz', history_arr)
+
+        history.append(model)
+
+        # train
+        # out_spatial, out_non_spatial = model(state_model)
+        if score > score_pre:
+            history_arr = np.array(history)
+            np.savez_compressed('./save/history_random.npz', history_arr)
+            agent.save("./save/Simple64-rand.pt")
+            score_pre = score
+        model_new = SimpleConvNet(in_channels=38, out_channels=[len(categorical_actions), 4096])
+        model_new = model_new.cuda() if torch.cuda.is_available() else model_new
+
+        params1 = model_new.named_parameters()
+        params2 = model.named_parameters()
+
+        dict_params2 = dict(params2)
+
+        for name1, param1 in params1:
+            if name1 in dict_params2:
+                dict_params2[name1].data.copy_(param1.data)
+

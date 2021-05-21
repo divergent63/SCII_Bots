@@ -274,6 +274,7 @@ def get_action_v2(id_action, point, obs):
         target = to_yx(point)
         return actions.FunctionCall(_SELECT_POINT, [_NOT_QUEUED, target]), smart_action
 
+
 class action_v2():
     def __init__(self, obs):
         

@@ -1,6 +1,8 @@
 import math
 import numpy as np
 
+import torch
+
 import os, sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
@@ -16,13 +18,14 @@ class RandomAgent:
         self.rewards = []
         self.actions = []
         self.points = []
+        self.score = []
         # self.policy_predictions=[]
         # self.spatial_predictions=[]
         self.gamma = 0.95  # discount rate
         self.categorical_actions = categorical_actions
         self.spatial_actions = spatial_actions
         self.model = model
-        self.epsilon = 0.5
+        # self.epsilon = 0.5
         self.id_from_actions = id_from_actions
         self.action_from_id = action_from_id
 
@@ -30,11 +33,13 @@ class RandomAgent:
         if self.epsilon > 0.1:
             self.epsilon = 0.999 * self.epsilon
 
-    def append_sample(self, state, action, reward, point):
+    def append_sample(self, state, action, point, reward, score):
         self.states.append(state)
         self.rewards.append(reward)
-        self.actions.append(self.id_from_actions[action])
+        self.actions.append(action)
         self.points.append(point)
+        self.score.append(score)
+        return [state, action, point, reward, score]
 
     def discount_rewards(self, rewards):
         discounted_rewards = np.zeros_like(rewards)
@@ -44,15 +49,22 @@ class RandomAgent:
             discounted_rewards[t] = running_add
         return discounted_rewards
 
-    def act(self, state, init=False):
-        # if init or np.random.random() < self.epsilon:
-        #     return self.action_from_id[np.random.choice(len(self.action_from_id), 1)[0]],np.random.randint(4096)
-        # else:
-        #     state.append(np.zeros((1, 1)))
-        #     preds = self.model.predict(state)
-        #     # return self.action_from_id[np.random.choice(len(self.action_from_id), 1, p=preds[1][0])[0]], np.random.choice(len(self.action_from_id), 1, p=preds[2][0])[0]
-        #     return self.action_from_id[np.random.choice(len(self.action_from_id), 1, p=preds[1][0])[0]], np.random.choice(4096, 1, p=preds[2][0])[0]
-        return self.action_from_id[np.random.choice(len(self.action_from_id), 1)[0]], np.random.randint(4096)
+    def act(self, state, init=False, epsilon=0.5):
+        ep = np.random.random()
+        if not init or ep < epsilon:
+            # return self.action_from_id[np.random.choice(len(self.action_from_id), 1)[0]], np.random.randint(4096)
+            return np.random.choice(list(self.action_from_id.values()), 1), np.random.randint(4096)
+        else:
+            state.append(np.zeros((1, 1)))
+            preds = self.model(state)
+            # return self.action_from_id[np.random.choice(len(self.action_from_id), 1, p=preds[1][0])[0]], np.random.choice(len(self.action_from_id), 1, p=preds[2][0])[0]
+            # return self.action_from_id[np.random.choice(len(self.action_from_id), 1, p=preds[0].cpu().detach().numpy())[0]], np.random.choice(4096, 1, p=preds[1].cpu().detach().numpy())[0]
+            return np.random.choice(list(self.action_from_id.values()), 1, p=preds[0].cpu().detach().numpy())[0], np.random.choice(4096, 1, p=preds[1].cpu().detach().numpy())[0]
+            
+    def act_randomly(self):
+        return self.action_from_id[np.random.choice(
+            len(self.action_from_id), 1
+        )[0]], np.random.randint(4096)
 
     def train(self):
         episode_length = len(self.states)
@@ -98,8 +110,8 @@ class RandomAgent:
 
     def load(self, name):
         if self.model:
-            self.model.load_weights(name)
+            self.model.load_state_dict(torch.load(name))
 
     def save(self, name):
         if self.model:
-            self.model.save_weights(name)
+            torch.save(self.model.state_dict(), name)

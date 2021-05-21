@@ -20,7 +20,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
 from random_agent import RandomAgent
 # from network import FullyConv
-from utils import get_state, get_action_v2
+from utils import get_state, get_action_v2, action_v2
 import numpy as np
 
 seed = 500
@@ -140,7 +140,6 @@ model = None
 
 # initalize Agent
 agent = RandomAgent(model, categorical_actions, spatial_actions, id_from_actions, action_from_id)
-
 FLAGS = flags.FLAGS
 FLAGS(['run_sc2'])
 
@@ -151,8 +150,8 @@ ensure_available_actions = True
 disable_fog = True
 
 steps_per_episode = 0   # 0 actually means unlimited
-MAX_EPISODES = 2
-MAX_STEPS = 50
+MAX_EPISODES = 5
+MAX_STEPS = 400
 steps = 0
 
 # run trajectories and train
@@ -160,7 +159,7 @@ with sc2_env.SC2Env(
         map_name="Simple64",
         players=[sc2_env.Agent(sc2_env.Race.terran),
                  # sc2_env.Bot(sc2_env.Race.protoss, sc2_env.Difficulty.very_easy)
-                 sc2_env.Bot(sc2_env.Race.terran, sc2_env.Difficulty.easy)
+                 sc2_env.Bot(sc2_env.Race.protoss, sc2_env.Difficulty.easy)
                  ],
         visualize=viz, agent_interface_format=sc2_env.AgentInterfaceFormat(
         feature_dimensions=sc2_env.Dimensions(
@@ -178,6 +177,9 @@ with sc2_env.SC2Env(
     done = False
     history = []
 
+    obs = env.reset()
+    actions = action_v2(obs=obs[0])
+
     for e in range(MAX_EPISODES):
         obs = env.reset()
 
@@ -192,23 +194,45 @@ with sc2_env.SC2Env(
             if e == 0 and time == 0:
                 init = True
 
-            a, point = agent.act_randomly()
+            a, point = agent.act(state, init)
 
-            func, act_a = get_action_v2(a, point, obs=obs[0])
+            # func, act_a = get_action_v2(a, point, obs=obs[0])
+
+            if time > 100 and time <= 120:
+                func = actions.train_scv()
+            elif time == 121:
+                func = actions.select_scv()
+            elif time > 121 and time <= 110:
+                func = actions.build_supply_depot(point)
+            elif time == 151:
+                func = actions.select_scv()
+            elif time > 151 and time <= 160:
+                func = actions.build_barracks(point)
+            elif time == 161:
+                func = actions.select_barracks()
+            elif time > 161 and time < 180:
+                func = actions.train_marine()
+            elif time == 180:
+                func = actions.select_army()
+            elif time == 181:
+                func = actions.attack(point)
+            else:
+                func = actions.do_nothing()
+            # func, _ = actions.correct_available_actions(func, act_a)
             next_obs = env.step([func])
-            print(act_a, point)
+            # print(act_a, point)
+            print(point)
 
             next_state = get_state(next_obs[0])
 
             reward = float(next_obs[0].reward) + float(np.sum(next_obs[0].observation.score_cumulative)) * 10e-8
 
-            if env._controllers and env._controllers[0].status.value != 3:
-                done = True
-            if time == MAX_STEPS-1:
-                done = True
-            # done = next_obs[0].last()
-            
-            agent.append_sample(state, act_a, point, reward, score)
+            # if env._controllers and env._controllers[0].status.value != 3:
+            #     done = True
+            # if time == MAX_STEPS-1:
+            #     done = True
+
+            # agent.append_sample(state, act_a, reward, point)
             state = next_state
             obs = next_obs
             if done:
@@ -218,15 +242,15 @@ with sc2_env.SC2Env(
 
                 done = False
 
-            if time % 10 == 0:
-                if score_pre < score:
-                    # save agent model
-                    history.append(
-                        [e, time, state, next_state, act_a, reward, score, done]
-                    )
+            # if time % 10 == 0:
+            #     if score_pre < score:
+            #         # save agent model
+            #         history.append(
+            #             [e, time, state, next_state, act_a, reward, score, done]
+            #         )
 
             score += reward
 
             time += 1
-    history_arr = np.array(history)
+    # history_arr = np.array(history)
     # np.savez_compressed('history_random.npz', history_arr)
