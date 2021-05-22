@@ -228,10 +228,10 @@ class SimpleConvNet(nn.Module):
         self.fc21 = nn.Linear(32, out_channels[0])      # len(categorical_actions)
         self.fc22 = nn.Linear(32, out_channels[1])       # 4096
 
-    def forward(self, input):           # 输入图片大小为：input = Variable(torch.randn(1, 1, 28, 28)) 即28*28的单通道图片
-        input0 = torch.unsqueeze(Variable(torch.tensor(input[0])), 0)            # input.shape = (1, 27, 64, 64)
+    def forward(self, input_x):           # 输入图片大小为：input = Variable(torch.randn(1, 1, 28, 28)) 即28*28的单通道图片
+        input0 = torch.unsqueeze(Variable(torch.tensor(input_x[0])), 0)            # input.shape = (1, 27, 64, 64)
         input0 = input0.cuda() if torch.cuda.is_available() else input0
-        input1 = torch.unsqueeze(Variable(torch.tensor(input[1])), 0)            # input.shape = (1, 11, 64, 64)
+        input1 = torch.unsqueeze(Variable(torch.tensor(input_x[1])), 0)            # input.shape = (1, 11, 64, 64)
         input1 = input1.cuda() if torch.cuda.is_available() else input1
         # input2 = input2.cuda() if torch.cuda.is_available() else input2          # input.shape = (11, )
 
@@ -244,9 +244,9 @@ class SimpleConvNet(nn.Module):
         x1 = self.fc21(x)
         x2 = self.fc22(x)
 
-        p = torch.softmax(x1, 0)
-        v = torch.softmax(x2, 0)
-        return p, v
+        p1 = torch.softmax(x1, 0)
+        p2 = torch.softmax(x2, 0)
+        return p1, p2
 
     def test(self):
         # 网络结构：conv2d--maxpool2d--conv2d--maxpool2d--fullyconnect--fullyconnect
@@ -260,3 +260,134 @@ class SimpleConvNet(nn.Module):
         params = list(self.SimpleConvNet.parameters())
         for i in params:
             print('the structure of this layer is ' + str(list(i.size())))
+
+
+class SimpleConvNet_prob(nn.Module):
+    def __init__(self, in_channels, out_channels):
+        super(SimpleConvNet_prob, self).__init__()
+        '''
+        这是对继承自父类的属性进行初始化。而且是用父类的初始化方法来初始化继承的属性。
+        也就是说，子类继承了父类的所有属性和方法，父类属性自然会用父类方法来进行初始化。
+        '''
+        # 定义网络结构
+        """
+        nn.Conv2d(in_channels, 8, 5)：
+            W：in_channels: 输入大小  64*64
+            F：卷积核大小 5*5
+            P：填充值的大小    0默认值
+            S：步长大小  1默认值
+            N：输出大小
+                N=(W-F+2P)/S+1=(64-5 + 2*0)/1 + 1 = 60
+            out_channels: 输出通道数 8
+            输出为：8(out_channels)*60*60           # 有小数时向下取整
+        """
+        self.conv1 = nn.Conv2d(in_channels=in_channels, out_channels=8, kernel_size=5)
+
+        """
+        nn.MaxPool2d(2, 2):
+            W：输入大小  60*60
+            F：kernel_size: 卷积核大小 2*2
+            P：填充值的大小    0默认值
+            S：stride: 步长大小  2
+            N：输出大小          # 有小数时向上取整
+                N=(W-F+2P)/S+1=(60-2 + 2*0)/2 + 1 = 30
+            out_channels: 输出通道数 8
+            输出为：8*30*30
+        """
+        self.pool1 = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.conv2 = nn.Conv2d(8, 16, 5)
+        self.pool2 = nn.MaxPool2d(kernel_size=2, stride=2)
+
+        # self.fc1 = nn.Linear(16*12*12, 32)
+        self.fc1 = nn.Linear(16 * 13 * 13, 32)
+        self.fc21 = nn.Linear(32, out_channels[0])  # len(categorical_actions)
+        self.fc22 = nn.Linear(32, out_channels[1])  # 4096
+
+    def forward(self, input_x):  # 输入图片大小为：input = Variable(torch.randn(1, 1, 28, 28)) 即28*28的单通道图片
+        input0 = torch.unsqueeze(Variable(torch.tensor(input_x[0])), 0) if len(input_x[0].shape) == 3 else Variable(torch.tensor(input_x[0]))  # input.shape = (1, 27, 64, 64)
+        input0 = input0.cuda() if torch.cuda.is_available() else input0
+        input1 = torch.unsqueeze(Variable(torch.tensor(input_x[1])), 0) if len(input_x[1].shape) == 3 else Variable(torch.tensor(input_x[1]))  # input.shape = (1, 11, 64, 64)
+        input1 = input1.cuda() if torch.cuda.is_available() else input1
+        # input2 = input2.cuda() if torch.cuda.is_available() else input2          # input.shape = (11, )
+
+        input_concat = torch.cat([input0, input1], dim=1)
+        x = self.pool1(F.relu(self.conv1(input_concat.float())))
+        # x = torch.flatten(x)
+        x = self.pool2(F.relu(self.conv2(x)))
+        # x = self.fc1(x.flatten())
+        x = self.fc1(x.view(x.size(0), -1))         # x.view(x.size(0), -1): 自动识别batch维度
+
+        x1 = self.fc21(x)
+        x2 = self.fc22(x)
+
+        p1 = torch.softmax(x1, 1)
+        p2 = torch.softmax(x2, 1)
+        return p1, p2
+
+    def test(self):
+        # 网络结构：conv2d--maxpool2d--conv2d--maxpool2d--fullyconnect--fullyconnect
+        net = self.SimpleConvNet()
+        print(net)
+        input = Variable(torch.randn(1, 38, 64, 64))
+        out = net(input)
+        print(out.size())
+
+    def structure(self):
+        params = list(self.SimpleConvNet.parameters())
+        for i in params:
+            print('the structure of this layer is ' + str(list(i.size())))
+            
+            
+class SimpleConvNet_val(nn.Module):
+    def __init__(self, input_size, output_size):
+        super(SimpleConvNet_val, self).__init__()
+        # 定义网络结构
+        """
+        nn.Conv2d(in_channels, 8, 5)：
+            W：in_channels: 输入大小  64*64
+            F：卷积核大小 5*5
+            P：填充值的大小    0默认值
+            S：步长大小  1默认值
+            N：输出大小
+                N=(W-F+2P)/S+1=(64-5 + 2*0)/1 + 1 = 60
+            out_channels: 输出通道数 8
+            输出为：8(out_channels)*60*60           # 有小数时向下取整
+        """
+        self.conv1 = nn.Conv2d(in_channels=input_size, out_channels=8, kernel_size=5)
+
+        """
+        nn.MaxPool2d(2, 2):
+            W：输入大小  60*60
+            F：kernel_size: 卷积核大小 2*2
+            P：填充值的大小    0默认值
+            S：stride: 步长大小  2
+            N：输出大小          # 有小数时向上取整
+                N=(W-F+2P)/S+1=(60-2 + 2*0)/2 + 1 = 30
+            out_channels: 输出通道数 8
+            输出为：8*30*30
+        """
+        self.pool1 = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.conv2 = nn.Conv2d(8, 16, 5)
+        self.pool2 = nn.MaxPool2d(kernel_size=2, stride=2)
+
+        # self.fc1 = nn.Linear(16*12*12, 32)
+        self.fc1 = nn.Linear(16 * 13 * 13, 32)
+        self.fc2 = nn.Linear(32, output_size)  # len(categorical_actions)
+
+    def forward(self, input_x):
+        input0 = torch.unsqueeze(Variable(torch.tensor(input_x[0])), 0) if len(input_x[0].shape) == 3 else Variable(torch.tensor(input_x[0]))  # input.shape = (1, 27, 64, 64)
+        input0 = input0.cuda() if torch.cuda.is_available() else input0
+        input1 = torch.unsqueeze(Variable(torch.tensor(input_x[1])), 0) if len(input_x[1].shape) == 3 else Variable(torch.tensor(input_x[1]))  # input.shape = (1, 11, 64, 64)
+        input1 = input1.cuda() if torch.cuda.is_available() else input1
+        # input2 = input2.cuda() if torch.cuda.is_available() else input2          # input.shape = (11, )
+
+        input_concat = torch.cat([input0, input1], dim=1)
+        x = self.pool1(F.relu(self.conv1(input_concat.float())))
+        # x = torch.flatten(x)
+        x = self.pool2(F.relu(self.conv2(x)))
+        # x = self.fc1(x.flatten())
+        x = self.fc1(x.view(x.size(0), -1))         # x.view(x.size(0), -1): 自动识别batch维度
+        x = self.fc2(x)
+        v = torch.sigmoid(x)
+        return v
+

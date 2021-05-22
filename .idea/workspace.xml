@@ -2,14 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="83c55def-b555-4b28-84bd-e55eca982cb3" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/a2c_agent.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/runner_a2c.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/a2c_agent.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/network.py" beforeDir="false" afterPath="$PROJECT_DIR$/network.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/runner.py" beforeDir="false" afterPath="$PROJECT_DIR$/runner.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/runner_a2c.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/random_agent.py" beforeDir="false" afterPath="$PROJECT_DIR$/random_agent.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/runner_random_search.py" beforeDir="false" afterPath="$PROJECT_DIR$/runner_random_search.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/save/Simple64-rand.pt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/save/history_random.npz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -19,42 +18,31 @@
   </component>
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/SCII_Bots$runner_deterministic_sequential.coverage" NAME="runner_deterministic_sequential Coverage Results" MODIFIED="1621439068394" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/SCII_Bots$runner_random_search.coverage" NAME="runner_random_search Coverage Results" MODIFIED="1621667942000" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/SCII_Bots$runner_a2c.coverage" NAME="runner_a2c Coverage Results" MODIFIED="1621704254883" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/SCII_Bots$runner_random_search.coverage" NAME="runner_random_search Coverage Results" MODIFIED="1621674483265" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/SCII_Bots$runner.coverage" NAME="runner Coverage Results" MODIFIED="1621667254258" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/random_agent.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="817">
-              <caret line="58" selection-end-line="117" />
-              <folding>
-                <element signature="e#0#11#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/runner.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="467">
-              <caret line="153" column="16" selection-start-line="153" selection-start-column="16" selection-end-line="153" selection-end-column="16" />
-              <folding>
-                <element signature="e#0#46#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/runner_random_search.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="181">
-              <caret line="190" selection-start-line="190" selection-end-line="190" />
+            <state relative-caret-position="398">
+              <caret line="266" selection-start-line="266" selection-end-line="266" />
               <folding>
                 <element signature="e#0#46#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/utils.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="247">
+              <caret line="224" selection-start-line="224" selection-end-line="224" />
+              <folding>
+                <element signature="e#0#18#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -63,8 +51,31 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/network.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-673">
-              <caret line="204" column="45" selection-start-line="204" selection-start-column="45" selection-end-line="204" selection-end-column="45" />
+            <state relative-caret-position="-1186">
+              <caret line="305" column="25" selection-start-line="305" selection-start-column="25" selection-end-line="305" selection-end-column="25" />
+              <folding>
+                <element signature="e#0#11#0" expanded="true" />
+                <element signature="e#1080#1098#0" />
+                <element signature="e#8433#11233#0" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/pydevd.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="195">
+              <caret line="1134" selection-start-line="1134" selection-end-line="1134" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/a2c_agent.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-305">
+              <caret line="48" column="23" selection-start-line="48" selection-start-column="23" selection-end-line="48" selection-end-column="23" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -72,38 +83,47 @@
           </provider>
         </entry>
       </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/_pydev_imps/_pydev_execfile.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="323">
+              <caret line="17" selection-start-line="17" selection-end-line="17" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone_v8/Lib/site-packages/torch/nn/functional.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="423">
+              <caret line="1370" selection-start-line="1370" selection-end-line="1370" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone_v8/Lib/site-packages/torch/nn/modules/conv.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-87">
+              <caret line="339" selection-start-line="339" selection-end-line="339" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone_v8/Lib/site-packages/pysc2/lib/named_array.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="312">
+              <caret line="140" selection-start-line="140" selection-end-line="140" />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone_v8/Lib/site-packages/websocket/_core.py">
+        <entry file="file://$PROJECT_DIR$/runner_a2c.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="294">
-              <caret line="490" column="50" lean-forward="true" selection-start-line="490" selection-start-column="16" selection-end-line="490" selection-end-column="50" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone_v8/Lib/site-packages/pysc2/lib/protocol.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="418">
-              <caret line="90" selection-start-line="90" selection-end-line="90" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone_v8/Lib/site-packages/pysc2/lib/remote_controller.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="190">
-              <caret line="182" selection-start-line="182" selection-end-line="182" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone_v8/Lib/site-packages/pysc2/lib/stopwatch.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3762">
-              <caret line="211" selection-start-line="211" selection-end-line="211" />
+            <state relative-caret-position="204">
+              <caret line="318" column="30" selection-start-line="318" selection-start-column="30" selection-end-line="318" selection-end-column="30" />
             </state>
           </provider>
         </entry>
@@ -119,38 +139,40 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>actions.FUNCTIONS.select_army.id</find>
-      <find>_SELECT_ARMY</find>
-      <find>army_rallied</find>
-      <find>id_action</find>
-      <find>smart_action</find>
-      <find>act_a</find>
-      <find>do_n</find>
-      <find>real</find>
-      <find>lib</find>
-      <find>obs</find>
-      <find>_observe</find>
-      <find>point</find>
-      <find>input_player</find>
-      <find>select_b</find>
-      <find>keras</find>
-      <find>gpu</find>
-      <find>model</find>
-      <find>cuda</find>
-      <find>flatten</find>
-      <find>a</find>
-      <find>done</find>
-      <find>input</find>
-      <find>SimpleConvNet</find>
-      <find>control</find>
-      <find>client</find>
-      <find>sock</find>
-      <find>StarcraftProtocol</find>
-      <find>shutdown</find>
+      <find>cat</find>
+      <find>spatial_actions</find>
+      <find>states_var</find>
+      <find>act</find>
       <find>settimeout</find>
+      <find>init_state</find>
+      <find>categorical_actions</find>
+      <find>actions_var_1</find>
+      <find>feature_screen</find>
+      <find>model_critic</find>
+      <find>discount_reward</find>
+      <find>agent.states[n]</find>
+      <find>self.next_state</find>
+      <find>model_actor</find>
+      <find>preds</find>
+      <find>.cuda</find>
+      <find>squee</find>
+      <find>log_softmax_actions_1</find>
+      <find>detach</find>
+      <find>loos</find>
+      <find>_SELECT_IDLE_WORKER</find>
+      <find>model</find>
+      <find>app</find>
+      <find>MAX_EPISODES</find>
+      <find>torch.tens</find>
+      <find>loss</find>
+      <find>_TERRAN_SCV</find>
+      <find>Tensor</find>
+      <find>num_samples</find>
+      <find>loss of actor</find>
     </findStrings>
     <replaceStrings>
       <replace>self.obs</replace>
+      <replace>critic_network_loss</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -162,23 +184,22 @@
       <list>
         <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/runner_deterministic_sequential.py" />
-        <option value="$PROJECT_DIR$/utils.py" />
-        <option value="$PROJECT_DIR$/random_agent.py" />
-        <option value="$PROJECT_DIR$/network.py" />
         <option value="$PROJECT_DIR$/runner.py" />
+        <option value="$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone_v8/Lib/site-packages/websocket/_core.py" />
+        <option value="$PROJECT_DIR$/random_agent.py" />
         <option value="$PROJECT_DIR$/runner_random_search.py" />
         <option value="$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone_v8/Lib/site-packages/pysc2/lib/protocol.py" />
-        <option value="$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone_v8/Lib/site-packages/websocket/_core.py" />
+        <option value="$PROJECT_DIR$/network.py" />
         <option value="$PROJECT_DIR$/a2c_agent.py" />
+        <option value="$PROJECT_DIR$/utils.py" />
         <option value="$PROJECT_DIR$/runner_a2c.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="1266" />
-    <option name="y" value="1" />
-    <option name="width" value="1299" />
-    <option name="height" value="1459" />
+    <option name="x" value="1272" />
+    <option name="width" value="1297" />
+    <option name="height" value="1448" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
@@ -192,6 +213,11 @@
             <path>
               <item name="SCII_Bots" type="b2602c69:ProjectViewProjectNode" />
               <item name="SCII_Bots" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="SCII_Bots" type="b2602c69:ProjectViewProjectNode" />
+              <item name="SCII_Bots" type="462c0819:PsiDirectoryNode" />
+              <item name="save" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="SCII_Bots" type="b2602c69:ProjectViewProjectNode" />
@@ -210,6 +236,11 @@
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\software\python_prj\SCII\SCII_Bots" />
+    </key>
+  </component>
   <component name="RunDashboard">
     <option name="ruleStates">
       <list>
@@ -222,7 +253,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.runner_random_search">
+  <component name="RunManager" selected="Python.runner_a2c">
     <configuration name="runner" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="SCII_Bots" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -237,6 +268,28 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/runner.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="runner_a2c" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="SCII_Bots" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/runner_a2c.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -291,6 +344,7 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.runner_a2c" />
         <item itemvalue="Python.runner_random_search" />
         <item itemvalue="Python.runner" />
         <item itemvalue="Python.runner_deterministic_sequential" />
@@ -310,12 +364,12 @@
       <workItem from="1621414556516" duration="17579000" />
       <workItem from="1621492810598" duration="38109000" />
       <workItem from="1621619754968" duration="7908000" />
-      <workItem from="1621664828091" duration="3601000" />
+      <workItem from="1621664828091" duration="34948000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="67197000" />
+    <option name="totallyTimeSpent" value="98544000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="2062" height="1166" extended-state="6" />
@@ -326,8 +380,8 @@
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.32978722" />
-      <window_info anchor="bottom" id="Debug" order="3" visible="true" weight="0.39941972" />
+      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.32978722" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.39941972" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -340,7 +394,7 @@
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" id="SciView" order="3" weight="0.3299285" />
+      <window_info anchor="right" id="SciView" order="3" weight="0.67517877" />
       <window_info anchor="right" id="Database" order="4" />
     </layout>
   </component>
@@ -391,40 +445,67 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/utils.py</url>
-          <line>223</line>
-          <option name="timeStamp" value="19" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone/Lib/site-packages/tensorflow/python/pywrap_tensorflow.py</url>
           <line>69</line>
           <option name="timeStamp" value="27" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone_v8/Lib/site-packages/websocket/_core.py</url>
-          <line>495</line>
-          <option name="timeStamp" value="66" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone_v8/Lib/site-packages/websocket/_core.py</url>
-          <line>493</line>
-          <option name="timeStamp" value="67" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone_v8/Lib/site-packages/pysc2/lib/protocol.py</url>
-          <line>90</line>
-          <option name="timeStamp" value="68" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone_v8/Lib/site-packages/websocket/_core.py</url>
-          <line>490</line>
-          <option name="timeStamp" value="71" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
   <component name="debuggerHistoryManager">
     <expressions id="evaluateCodeFragment">
+      <expression>
+        <expression-string>np.concatenate(
+                    [[agent.states[i][0] for i in range(len(agent.states))],
+                    [agent.states[i][1] for i in range(len(agent.states))]],
+    axis=1
+                )</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>torch.Tensor(np.concatenate(
+                    [[agent.states[i][0] for i in range(len(agent.states))],
+                     [agent.states[i][1] for i in range(len(agent.states))]],
+                    axis=1
+                ))</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>torch.Tensor(np.concatenate(
+                    [[agent.states[i][0] for i in range(len(agent.states))],
+                     [agent.states[i][1] for i in range(len(agent.states))]],
+                    axis=1
+                )</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>np.concatenate(
+                    [[agent.states[i][0] for i in range(len(agent.states))],
+                    [agent.states[i][1] for i in range(len(agent.states))]],
+    axis=0
+                )</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>np.concatenate(
+                    [[agent.states[i][0] for i in range(len(agent.states))],
+                    [agent.states[i][1] for i in range(len(agent.states))]]
+                )</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>np.concatenate(
+                    [agent.states[i][0] for i in range(len(agent.states))],
+                    [agent.states[i][1] for i in range(len(agent.states))]
+                )</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
       <expression>
         <expression-string>np.random.choice(list(self.action_from_id.values()), 1)</expression-string>
         <language-id>Python</language-id>
@@ -440,85 +521,55 @@
         <language-id>Python</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
-      <expression>
-        <expression-string>np.random.choice(self.action_from_id.values)</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>np.random.choice(self.action_from_id)</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>np.random.choice(self.action_from_id, 1)</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>np.random.choice(len(self.action_from_id), 0)</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>np.random.choice(len(self.action_from_id), 1)</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>np.random.choice(len(self.id_from_actions), 1)</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
-      </expression>
     </expressions>
     <expressions id="evaluateExpression">
       <expression>
-        <expression-string>dict_params2</expression-string>
+        <expression-string>e % 100</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>model_new</expression-string>
+        <expression-string>print('episode: {0}, loos of actor: {1}, loss of critic: %f, score: %f'.format(e, actor_network_losses[0], critic_network_losses[0], score))</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>model</expression-string>
+        <expression-string>print('episode: {}, loos of actor: {}, loss of critic: {}, score: {}'.format(e, np.sum(actor_network_losses), np.sum(critic_network_losses), score))</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>model.fc1._parameters</expression-string>
+        <expression-string>print('episode: {0}, loos of actor: {1}, loss of critic: %f, score: %f').format(e, actor_network_losses[0], critic_network_losses[0], score)</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>next_obs[0].last()</expression-string>
+        <expression-string>print('episode: {%d}, loos of actor: {%d}, loss of critic: %f, score: %f').format(e, actor_network_losses[0], critic_network_losses[0], score)</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>list(self.action_from_id.values())</expression-string>
+        <expression-string>print('episode: %d, loos of actor: %d, loss of critic: %f, score: %f').format(e, actor_network_losses[0], critic_network_losses[0], score)</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>self.action_from_id.values()</expression-string>
+        <expression-string>print('episode: d%, loos of actor: %d, loss of critic: %f, score: %f') % (e, actor_network_losses[0], critic_network_losses[0], score)</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>self.action_from_id.keys()</expression-string>
+        <expression-string>print('episode: %d, loos of actor: %d, loss of critic: %f, score: %f') % (e, actor_network_losses[0], critic_network_losses[0], score)</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>self.action_from_id[7]</expression-string>
+        <expression-string>print(e, np.sum(actor_network_losses), np.sum(critic_network_losses), score)</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>self.action_from_id{7}</expression-string>
+        <expression-string>print('episode: %d, loos of actor: %d, loss of critic: %f, score: %f') % (e, np.sum(actor_network_losses), np.sum(critic_network_losses), score)</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
@@ -526,13 +577,6 @@
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/runner_deterministic_sequential.py" />
-    <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/_pydev_imps/_pydev_execfile.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="323">
-          <caret line="17" selection-start-line="17" selection-end-line="17" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone/Lib/site-packages/pysc2/lib/stopwatch.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="3762">
@@ -589,16 +633,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/utils.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3154">
-          <caret line="166" column="5" selection-start-line="166" selection-start-column="5" selection-end-line="166" selection-end-column="5" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone/Lib/site-packages/torch/nn/modules/pooling.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1349">
@@ -627,24 +661,17 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone_v8/Lib/site-packages/pysc2/env/sc2_env.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4218">
-          <caret line="245" column="24" selection-start-line="245" selection-start-column="24" selection-end-line="245" selection-end-column="24" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/pydevd.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="33060">
-          <caret line="1740" selection-start-line="1740" selection-end-line="1740" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone_v8/Lib/site-packages/pysc2/lib/stopwatch.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="3762">
           <caret line="211" selection-start-line="211" selection-end-line="211" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone_v8/Lib/site-packages/pysc2/lib/remote_controller.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="190">
+          <caret line="182" selection-start-line="182" selection-end-line="182" />
         </state>
       </provider>
     </entry>
@@ -660,48 +687,25 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/random_agent.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="817">
-          <caret line="58" selection-end-line="117" />
+        <state relative-caret-position="409">
+          <caret line="60" column="30" selection-start-line="60" selection-start-column="30" selection-end-line="60" selection-end-column="30" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/a2c_agent.py">
+    <entry file="file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone_v8/Lib/site-packages/pysc2/env/sc2_env.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-600">
-          <caret line="27" column="52" selection-start-line="27" selection-start-column="52" selection-end-line="27" selection-end-column="52" />
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="-95">
+          <caret line="97" column="6" selection-start-line="97" selection-start-column="6" selection-end-line="97" selection-end-column="6" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/network.py">
+    <entry file="file://$USER_HOME$/.PyCharm2018.3/system/python_stubs/702414281/numpy/random/mtrand.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-673">
-          <caret line="204" column="45" selection-start-line="204" selection-start-column="45" selection-end-line="204" selection-end-column="45" />
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/runner_random_search.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="181">
-          <caret line="190" selection-start-line="190" selection-end-line="190" />
-          <folding>
-            <element signature="e#0#46#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone_v8/Lib/site-packages/pysc2/lib/remote_controller.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="190">
-          <caret line="182" selection-start-line="182" selection-end-line="182" />
+        <state relative-caret-position="-87">
+          <caret line="228" column="4" selection-start-line="228" selection-start-column="4" selection-end-line="228" selection-end-column="4" />
         </state>
       </provider>
     </entry>
@@ -712,17 +716,94 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/runner_a2c.py">
+    <entry file="file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone_v8/Lib/site-packages/websocket/_core.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="19">
-          <caret line="184" column="82" selection-start-line="184" selection-start-column="82" selection-end-line="184" selection-end-column="82" />
+        <state relative-caret-position="180">
+          <caret line="490" selection-start-line="490" selection-end-line="490" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone_v8/Lib/site-packages/websocket/_core.py">
+    <entry file="file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone_v8/Lib/site-packages/pysc2/lib/named_array.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="294">
-          <caret line="490" column="50" lean-forward="true" selection-start-line="490" selection-start-column="16" selection-end-line="490" selection-end-column="50" />
+        <state relative-caret-position="312">
+          <caret line="140" selection-start-line="140" selection-end-line="140" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone_v8/Lib/site-packages/torch/nn/modules/conv.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-87">
+          <caret line="339" selection-start-line="339" selection-end-line="339" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/pydevd.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="1134" selection-start-line="1134" selection-end-line="1134" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone_v8/Lib/site-packages/torch/nn/functional.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="423">
+          <caret line="1370" selection-start-line="1370" selection-end-line="1370" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/runner_random_search.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="398">
+          <caret line="266" selection-start-line="266" selection-end-line="266" />
+          <folding>
+            <element signature="e#0#46#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/_pydev_imps/_pydev_execfile.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="323">
+          <caret line="17" selection-start-line="17" selection-end-line="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/utils.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="247">
+          <caret line="224" selection-start-line="224" selection-end-line="224" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/a2c_agent.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-305">
+          <caret line="48" column="23" selection-start-line="48" selection-start-column="23" selection-end-line="48" selection-end-column="23" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/network.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1186">
+          <caret line="305" column="25" selection-start-line="305" selection-start-column="25" selection-end-line="305" selection-end-column="25" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+            <element signature="e#1080#1098#0" />
+            <element signature="e#8433#11233#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/runner_a2c.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="204">
+          <caret line="318" column="30" selection-start-line="318" selection-start-column="30" selection-end-line="318" selection-end-column="30" />
         </state>
       </provider>
     </entry>

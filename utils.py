@@ -212,14 +212,16 @@ def get_action_v2(id_action, point, obs):
         if (obs.observation['feature_minimap'][_PLAYER_RELATIVE] == _PLAYER_HOSTILE).nonzero():         # 攻击已知敌人
             for i in range(0, len(enemy_y)):
                 if len(obs.observation['multi_select']):
-                    if obs.observation['multi_select'][0][0] != _TERRAN_SCV and _ATTACK_MINIMAP in obs.observation["available_actions"]:
+                    # if obs.observation['multi_select'][0][0] != _TERRAN_SCV and _ATTACK_MINIMAP in obs.observation["available_actions"]:
+                    if _ATTACK_MINIMAP in obs.observation["available_actions"]:
                         # if _ATTACK_MINIMAP in obs.observation["available_actions"]:
                         if enemy_y.any():
                             target = [int(enemy_x.mean()), int(enemy_y.mean())]
                             func = actions.FunctionCall(_ATTACK_MINIMAP, [_NOT_QUEUED, target])
         else:           # 攻击任意位置（未找到敌人时，类似巡逻）
             if len(obs.observation['multi_select']):
-                if obs.observation['multi_select'][0][0] != _TERRAN_SCV and _ATTACK_MINIMAP in obs.observation["available_actions"]:
+                # if obs.observation['multi_select'][0][0] != _TERRAN_SCV and _ATTACK_MINIMAP in obs.observation["available_actions"]:
+                if _ATTACK_MINIMAP in obs.observation["available_actions"]:
                     target = to_yx(point)
                     func = actions.FunctionCall(_ATTACK_MINIMAP, [_NOT_QUEUED, target])
     #

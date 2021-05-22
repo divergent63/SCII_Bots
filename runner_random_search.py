@@ -210,7 +210,7 @@ with sc2_env.SC2Env(
             print(act_a, point)
 
             next_state = get_state(next_obs[0])
-
+            next_state_model = [next_obs[0].observation.feature_screen, next_obs[0].observation.feature_minimap, next_obs[0].observation.player]
             reward = float(next_obs[0].reward) + float(np.sum(next_obs[0].observation.score_cumulative)) * 10e-8
 
             # if env._controllers and env._controllers[0].status.value != 3:          # env._controllers[0].status.value = 3 --> game running; env._controllers[0].status.value = 5 --> defeat;
@@ -225,7 +225,7 @@ with sc2_env.SC2Env(
             # if not next_obs[0].last():              #
             #     done = True
 
-            # history.append(agent.append_sample(state_model, act_a, point, reward, score))
+            history.append(agent.append_sample(state_model, next_state_model, act_a, point, reward, score))
             state = next_state
             obs = next_obs
             if done:
@@ -259,3 +259,8 @@ with sc2_env.SC2Env(
             if name1 in dict_params2:
                 dict_params2[name1].data.copy_(param1.data)
 
+
+"""
+D:\software\anaconda\a3_64\envs\py37_clone_v8\Lib\site-packages\websocket\_core.py:  WebSocket().close(self, status=STATUS_NORMAL, reason=bytes('', encoding='utf-8'), timeout=3)
+D:\software\anaconda\a3_64\envs\py37_clone_v8\Lib\site-packages\pysc2\lib\protocol.py:  StarcraftProtocol().close(self)
+"""

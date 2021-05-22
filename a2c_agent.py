@@ -2,6 +2,7 @@ import math
 import numpy as np
 
 import torch
+from torch.autograd import Variable
 
 import os, sys
 
@@ -10,22 +11,23 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 np.random.seed(1)
 
 
-class RandomAgent:
+class A2CAgent:
     """This class implements the random walking agent using the network model"""
 
     def __init__(self, model, categorical_actions, spatial_actions, id_from_actions, action_from_id):
         self.states = []
-        self.next_state = []
+        self.next_states = []
+        self.rewards = []
         self.actions = []
         self.points = []
-        self.rewards = []
         self.score = []
         # self.policy_predictions=[]
         # self.spatial_predictions=[]
         self.gamma = 0.95  # discount rate
         self.categorical_actions = categorical_actions
         self.spatial_actions = spatial_actions
-        self.model = model
+        self.model = model[0]           # Actor
+        self.value_model = model[1]         # Critic
         # self.epsilon = 0.5
         self.id_from_actions = id_from_actions
         self.action_from_id = action_from_id
@@ -34,14 +36,13 @@ class RandomAgent:
         if self.epsilon > 0.1:
             self.epsilon = 0.999 * self.epsilon
 
-    def append_sample(self, state, next_state, action, point, reward, score):
+    def append_sample(self, state, next_state, actions, reward, score):
         self.states.append(state)
-        self.next_state.append(next_state)
-        self.actions.append(action)
-        self.points.append(point)
+        self.next_states.append(next_state)
+        self.actions.append(actions)
         self.rewards.append(reward)
         self.score.append(score)
-        return [state, action, point, reward, score]
+        return [state, next_state, actions, reward, score]
 
     def discount_rewards(self, rewards):
         discounted_rewards = np.zeros_like(rewards)
@@ -51,18 +52,22 @@ class RandomAgent:
             discounted_rewards[t] = running_add
         return discounted_rewards
 
-    def act(self, state, init=False, epsilon=0.5):
+    def act(self, state, init=False, epsilon=0.2):
         ep = np.random.random()
-        if not init or ep < epsilon:
+        if not init and ep < epsilon:           # TODO: can't understand the probability matrix from uniform distribution --> SOLVED
             # return self.action_from_id[np.random.choice(len(self.action_from_id), 1)[0]], np.random.randint(4096)
-            return np.random.choice(list(self.action_from_id.values()), 1), np.random.randint(4096)
+            p1 = Variable(torch.Tensor(np.random.dirichlet(np.ones(11), size=1)).cuda() if torch.cuda.is_available() else torch.Tensor(np.random.dirichlet(np.ones(11), size=1)))
+            p2 = Variable(torch.Tensor(np.random.dirichlet(np.ones(4096), size=1)).cuda() if torch.cuda.is_available() else torch.Tensor(np.random.dirichlet(np.ones(4096), size=1)))
+            return [p1, p2]
         else:
-            state.append(np.zeros((1, 1)))
+            # state.append(np.zeros((1, 1)))
             preds = self.model(state)
             # return self.action_from_id[np.random.choice(len(self.action_from_id), 1, p=preds[1][0])[0]], np.random.choice(len(self.action_from_id), 1, p=preds[2][0])[0]
             # return self.action_from_id[np.random.choice(len(self.action_from_id), 1, p=preds[0].cpu().detach().numpy())[0]], np.random.choice(4096, 1, p=preds[1].cpu().detach().numpy())[0]
-            return np.random.choice(list(self.action_from_id.values()), 1, p=preds[0].cpu().detach().numpy())[0], np.random.choice(4096, 1, p=preds[1].cpu().detach().numpy())[0]
-            
+            # return np.random.choice(list(self.action_from_id.values()), 1, p=preds[0].cpu().detach().numpy())[0], \
+            #        np.random.choice(4096, 1, p=preds[1].cpu().detach().numpy())[0]
+            return preds
+
     def act_randomly(self):
         return self.action_from_id[np.random.choice(
             len(self.action_from_id), 1
@@ -82,7 +87,7 @@ class RandomAgent:
 
         update_inputs = [np.zeros((episode_length, 27, 64, 64)),
                          np.zeros((episode_length, 11, 64, 64)),
-                         np.zeros((episode_length, 11, ))
+                         np.zeros((episode_length, 11,))
                          # np.zeros((episode_length, 1))
                          ]  # Episode_lengthx64x64x4
 
