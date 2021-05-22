@@ -2,11 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="83c55def-b555-4b28-84bd-e55eca982cb3" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/a2c_agent.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/runner_a2c.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/a2c_agent.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/network.py" beforeDir="false" afterPath="$PROJECT_DIR$/network.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/runner.py" beforeDir="false" afterPath="$PROJECT_DIR$/runner.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/runner_a2c.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/runner_random_search.py" beforeDir="false" afterPath="$PROJECT_DIR$/runner_random_search.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/save/Simple64-rand.pt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/save/history_random.npz" beforeDir="false" />
@@ -51,8 +51,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/runner_random_search.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="543">
-              <caret line="243" column="29" selection-end-line="261" />
+            <state relative-caret-position="181">
+              <caret line="190" selection-start-line="190" selection-end-line="190" />
               <folding>
                 <element signature="e#0#46#0" expanded="true" />
               </folding>
@@ -63,8 +63,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/network.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="342">
-              <caret line="206" column="56" selection-start-line="206" selection-start-column="56" selection-end-line="206" selection-end-column="56" />
+            <state relative-caret-position="-673">
+              <caret line="204" column="45" selection-start-line="204" selection-start-column="45" selection-end-line="204" selection-end-column="45" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -73,34 +73,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/runner_a2c.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2060">
-              <caret line="261" lean-forward="true" selection-start-line="261" selection-end-line="261" />
-              <folding>
-                <element signature="e#0#46#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone_v8/Lib/site-packages/websocket/_core.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="351">
-              <caret line="496" column="20" selection-start-line="496" selection-start-column="20" selection-end-line="496" selection-end-column="20" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/a2c_agent.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-600">
-              <caret line="27" column="52" selection-start-line="27" selection-start-column="52" selection-end-line="27" selection-end-column="52" />
-              <folding>
-                <element signature="e#0#11#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="294">
+              <caret line="490" column="50" lean-forward="true" selection-start-line="490" selection-start-column="16" selection-end-line="490" selection-end-column="50" />
             </state>
           </provider>
         </entry>
@@ -108,7 +84,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone_v8/Lib/site-packages/pysc2/lib/protocol.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="190">
+            <state relative-caret-position="418">
               <caret line="90" selection-start-line="90" selection-end-line="90" />
             </state>
           </provider>
@@ -117,8 +93,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone_v8/Lib/site-packages/pysc2/lib/remote_controller.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="19">
-              <caret line="188" column="62" selection-start-line="188" selection-start-column="62" selection-end-line="188" selection-end-column="62" />
+            <state relative-caret-position="190">
+              <caret line="182" selection-start-line="182" selection-end-line="182" />
             </state>
           </provider>
         </entry>
@@ -334,24 +310,24 @@
       <workItem from="1621414556516" duration="17579000" />
       <workItem from="1621492810598" duration="38109000" />
       <workItem from="1621619754968" duration="7908000" />
-      <workItem from="1621664828091" duration="3122000" />
+      <workItem from="1621664828091" duration="3601000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="66718000" />
+    <option name="totallyTimeSpent" value="67197000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-6" y="0" width="1037" height="1158" extended-state="0" />
+    <frame x="-7" y="-7" width="2062" height="1166" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.2124617" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.103792414" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.32978722" />
-      <window_info active="true" anchor="bottom" id="Debug" order="3" visible="true" weight="0.40253413" />
+      <window_info anchor="bottom" id="Debug" order="3" visible="true" weight="0.39941972" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -425,11 +401,6 @@
           <option name="timeStamp" value="27" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/runner_random_search.py</url>
-          <line>196</line>
-          <option name="timeStamp" value="60" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone_v8/Lib/site-packages/websocket/_core.py</url>
           <line>495</line>
           <option name="timeStamp" value="66" />
@@ -443,11 +414,6 @@
           <url>file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone_v8/Lib/site-packages/pysc2/lib/protocol.py</url>
           <line>90</line>
           <option name="timeStamp" value="68" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone_v8/Lib/site-packages/websocket/_core.py</url>
-          <line>466</line>
-          <option name="timeStamp" value="69" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone_v8/Lib/site-packages/websocket/_core.py</url>
@@ -692,27 +658,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone_v8/Lib/site-packages/pysc2/lib/remote_controller.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="19">
-          <caret line="188" column="62" selection-start-line="188" selection-start-column="62" selection-end-line="188" selection-end-column="62" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone_v8/Lib/site-packages/pysc2/lib/protocol.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="190">
-          <caret line="90" selection-start-line="90" selection-end-line="90" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone_v8/Lib/site-packages/websocket/_core.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="351">
-          <caret line="496" column="20" selection-start-line="496" selection-start-column="20" selection-end-line="496" selection-end-column="20" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/random_agent.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="817">
@@ -735,8 +680,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/network.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="342">
-          <caret line="206" column="56" selection-start-line="206" selection-start-column="56" selection-end-line="206" selection-end-column="56" />
+        <state relative-caret-position="-673">
+          <caret line="204" column="45" selection-start-line="204" selection-start-column="45" selection-end-line="204" selection-end-column="45" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>
@@ -745,21 +690,39 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/runner_random_search.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="543">
-          <caret line="243" column="29" selection-end-line="261" />
+        <state relative-caret-position="181">
+          <caret line="190" selection-start-line="190" selection-end-line="190" />
           <folding>
             <element signature="e#0#46#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone_v8/Lib/site-packages/pysc2/lib/remote_controller.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="190">
+          <caret line="182" selection-start-line="182" selection-end-line="182" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone_v8/Lib/site-packages/pysc2/lib/protocol.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="418">
+          <caret line="90" selection-start-line="90" selection-end-line="90" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/runner_a2c.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2060">
-          <caret line="261" lean-forward="true" selection-start-line="261" selection-end-line="261" />
-          <folding>
-            <element signature="e#0#46#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="19">
+          <caret line="184" column="82" selection-start-line="184" selection-start-column="82" selection-end-line="184" selection-end-column="82" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../../anaconda/a3_64/envs/py37_clone_v8/Lib/site-packages/websocket/_core.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="294">
+          <caret line="490" column="50" lean-forward="true" selection-start-line="490" selection-start-column="16" selection-end-line="490" selection-end-column="50" />
         </state>
       </provider>
     </entry>
