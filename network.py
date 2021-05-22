@@ -196,25 +196,28 @@ class SimpleConvNet(nn.Module):
         '''
         # 定义网络结构
         """
-        nn.Conv2d(1, 10, 5)：
-            W：输入大小  28*28
+        nn.Conv2d(in_channels, 8, 5)：
+            W：in_channels: 输入大小  64*64
             F：卷积核大小 5*5
             P：填充值的大小    0默认值
             S：步长大小  1默认值
             N：输出大小
-            N=(W-F+2P)/S+1=(28-5 + 2*0)/1 + 1 = 24
-            输出为：10(out_channel)*24*24
+                N=(W-F+2P)/S+1=(64-5 + 2*0)/1 + 1 = 60
+            out_channels: 输出通道数 8
+            输出为：8(out_channels)*60*60           # 有小数时向下取整
         """
         self.conv1 = nn.Conv2d(in_channels=in_channels, out_channels=8, kernel_size=5)
+        
         """
         nn.MaxPool2d(2, 2):
-            W：输入大小  24*24
-            F：卷积核大小 5*5
+            W：输入大小  60*60
+            F：kernel_size: 卷积核大小 2*2
             P：填充值的大小    0默认值
-            S：步长大小  1默认值
-            N：输出大小
-            N=(W-F+2P)/S+1=(24-2 + 2*0)/2 + 1 = 12
-            输出为：10*12*12
+            S：stride: 步长大小  2
+            N：输出大小          # 有小数时向上取整
+                N=(W-F+2P)/S+1=(60-2 + 2*0)/2 + 1 = 30
+            out_channels: 输出通道数 8
+            输出为：8*30*30
         """
         self.pool1 = nn.MaxPool2d(kernel_size=2, stride=2)
         self.conv2 = nn.Conv2d(8, 16, 5)

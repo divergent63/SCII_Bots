@@ -151,7 +151,7 @@ ensure_available_actions = True
 disable_fog = True
 
 steps_per_episode = 0   # 0 actually means unlimited
-MAX_EPISODES = 2
+MAX_EPISODES = 5
 MAX_STEPS = 50
 steps = 0
 

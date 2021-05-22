@@ -19,7 +19,7 @@ import os, sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
 from random_agent import RandomAgent
-# from network import FullyConv, 
+# from network import FullyConv,
 from network import SimpleConvNet
 
 from utils import get_state, get_action_v2
