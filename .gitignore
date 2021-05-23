@@ -133,4 +133,6 @@ dmypy.json
 .idea/workspace.xml
 .idea/deployment.xml
 
+./temp
 .temp/
+temp/

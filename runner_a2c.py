@@ -146,10 +146,10 @@ expl_rate = 0.2
 # model = FullyConv(eta, expl_rate, categorical_actions,spatial_actions)
 
 # <obs[0].observation.feature_screen.shape(1) = 27> + <obs[0].observation.feature_screen.shape(1) = 11> = 38
-model_actor = SimpleConvNet_prob(in_channels=38, out_channels=[len(categorical_actions), 4096])
+model_actor = SimpleConvNet_prob(input_size=[27, 11], output_size=[len(categorical_actions), 4096])
 model_actor = model_actor.cuda() if torch.cuda.is_available() else model_actor
 
-model_critic = SimpleConvNet_val(input_size=38, output_size=1)
+model_critic = SimpleConvNet_val(input_size=[27, 11], output_size=1)
 model_critic = model_critic.cuda() if torch.cuda.is_available() else model_critic
 
 model = [model_actor, model_critic]
@@ -199,11 +199,16 @@ with sc2_env.SC2Env(
         ensure_available_actions=ensure_available_actions,
         disable_fog=disable_fog
 ) as env:
-    path_lst = os.listdir('./save')
-    max_episode_in_last_play = max([int(p.split('.')[0].split('i')[-1]) for p in path_lst])
-    load_path = [Path(Path(os.getcwd()) / 'save' / 'Simple64-a2c_actor-epi{}.pt'.format(max_episode_in_last_play)), Path(Path(os.getcwd()) / 'save' / 'Simple64-a2c_critic-epi{}.pt'.format(max_episode_in_last_play))]
-    if model and load_path[0].is_file() and load_path[1].is_file():
-        agent.load(load_path)
+    max_episode_in_last_play = 0
+
+    path_lst = os.listdir('./save/a2c')
+    if len(path_lst) != 0:
+        max_episode_in_last_play = max([int(p.split('.')[0].split('i')[-1]) for p in path_lst])
+        load_path = [Path(Path(os.getcwd()) / 'save' / 'a2c' / 'Simple64-a2c_actor-epi{}.pt'.format(max_episode_in_last_play)), Path(Path(os.getcwd()) / 'save' / 'a2c' / 'Simple64-a2c_critic-epi{}.pt'.format(max_episode_in_last_play))]
+        if model and load_path[0].is_file() and load_path[1].is_file():
+            # agent.load(load_path)
+            model_actor.load_state_dict(torch.load(load_path[0]))
+            model_critic.load_state_dict(torch.load(load_path[1]))
 
     done = False
     history = []
@@ -243,15 +248,24 @@ with sc2_env.SC2Env(
             next_state = get_state(next_obs[0])
             next_state_model = [np.array(next_obs[0].observation.feature_screen), np.array(next_obs[0].observation.feature_minimap), np.array(next_obs[0].observation.player)]
 
-            reward = float(next_obs[0].reward) + float(np.sum(next_obs[0].observation.score_cumulative)) * 10e-8
+            reward = float(next_obs[0].reward) + float(np.sum([
+                next_obs[0].observation.score_cumulative[0],
+                next_obs[0].observation.score_cumulative[3],
+                next_obs[0].observation.score_cumulative[4],
+                10*next_obs[0].observation.score_cumulative[5],
+                10*next_obs[0].observation.score_cumulative[6],
+                next_obs[0].observation.score_cumulative[7],
+                next_obs[0].observation.score_cumulative[9],
+                5*next_obs[0].observation.score_cumulative[11]
+            ])-8*next_obs[0].observation.score_cumulative[2]) * 10e-6
 
             if env._controllers and env._controllers[0].status.value != 3:          # env._controllers[0].status.value = 3 --> game running; env._controllers[0].status.value = 5 --> defeat;
                 done = True
                 if env._controllers[0].status.value == 5:           # 战败
                     reward = reward / 1000
-                    break
+                    # break
                     
-            if time == MAX_STEPS-1:
+            if time == MAX_STEPS-2:
                 done = True
             # if next_obs[0].last():
             #     done = True
@@ -273,69 +287,74 @@ with sc2_env.SC2Env(
             score += reward
             # time += 1
 
-        # history.append(model)
+            # history.append(model)
 
-        # if len(agent.states) > 2*num_samples:
-        if done:
+            # if len(agent.states) > 2*num_samples:
+            if done:
 
-            actor_network_losses = []
-            critic_network_losses = []
+                actor_network_losses = []
+                critic_network_losses = []
 
-            # for n in range(len(agent.states)):
+                # for n in range(len(agent.states)):
 
-            # # train
-            # # out_spatial, out_non_spatial = model(state_model)
-            # if score > score_pre:
-            #     history_arr = np.array(history)
-            #     np.savez_compressed('./save/history_random.npz', history)
-            #     agent.save("./save/Simple64-rand.pt")
-            #     score_pre = score
+                # # train
+                # # out_spatial, out_non_spatial = model(state_model)
+                # if score > score_pre:
+                #     history_arr = np.array(history)
+                #     np.savez_compressed('./save/history_random.npz', history)
+                #     agent.save("./save/Simple64-rand.pt")
+                #     score_pre = score
 
-            # init_state = agent.states[n]
-            actions_var_1 = Variable(torch.Tensor([agent.actions[i][0] for i in range(len(agent.actions))]).view(-1, len(categorical_actions)))
-            actions_var_2 = Variable(torch.Tensor([agent.actions[i][1] for i in range(len(agent.actions))]).view(-1, 4096))
-            states_var_1 = Variable(torch.Tensor([agent.states[i][0] for i in range(len(agent.states))]).view(-1, 27, 64, 64))
-            states_var_2 = Variable(torch.Tensor([agent.states[i][1] for i in range(len(agent.states))],).view(-1, 11, 64, 64))
+                # init_state = agent.states[n]
+                actions_var_action = Variable(torch.Tensor([agent.actions[i][0] for i in range(len(agent.actions))]).view(-1, len(categorical_actions)))
+                actions_var_point = Variable(torch.Tensor([agent.actions[i][1] for i in range(len(agent.actions))]).view(-1, 4096))
+                states_var_screen = Variable(torch.Tensor([agent.states[i][0] for i in range(len(agent.states))]).view(-1, 27, 64, 64))
+                states_var_minimap = Variable(torch.Tensor([agent.states[i][1] for i in range(len(agent.states))],).view(-1, 11, 64, 64))
+                states_var_player = Variable(torch.Tensor([agent.states[i][2] for i in range(len(agent.states))],).view(-1, 11))
 
-            # states_var = Variable(torch.Tensor(next_state_model).view(-1, len(38*64*64)))
+                # states_var = Variable(torch.Tensor(next_state_model).view(-1, len(38*64*64)))
 
-            # train actor network
-            model_actor.zero_grad()
-            log_softmax_actions_1, log_softmax_actions_2 = model_actor([states_var_1, states_var_2])
-            vs = model_critic([states_var_1, states_var_2]).detach().squeeze(1)
-            # calculate qs
-            qs = Variable(torch.Tensor(agent.discount_rewards(agent.rewards))).cuda() if torch.cuda.is_available() else Variable(torch.Tensor(agent.discount_rewards(agent.rewards)))
+                # train actor network
+                model_actor.zero_grad()
+                log_softmax_actions_1, log_softmax_actions_2 = model_actor([states_var_screen, states_var_minimap, states_var_player])
+                vs = model_critic([states_var_screen, states_var_minimap, states_var_player])
+                # calculate qs
+                qs = Variable(torch.Tensor(agent.discount_rewards(agent.rewards))).cuda() if torch.cuda.is_available() else Variable(torch.Tensor(agent.discount_rewards(agent.rewards)))
 
-            advantages = qs - vs
-            actor_network_loss = - torch.mean(torch.sum(log_softmax_actions_1.cpu()*actions_var_1, 1) * advantages.cpu()) - torch.mean(torch.sum(log_softmax_actions_2.cpu()*actions_var_2, 1) * advantages.cpu())
-            actor_network_loss.backward()
-            torch.nn.utils.clip_grad_norm(model_actor.parameters(), 0.5)
-            actor_optim.step()
+                advantages = qs - vs.detach().squeeze(1)
+                actor_network_loss = - torch.mean(torch.sum(log_softmax_actions_1.cpu()*actions_var_action, 1) * advantages.cpu()) - torch.mean(torch.sum(log_softmax_actions_2.cpu()*actions_var_point, 1) * advantages.cpu())
+                actor_network_loss.backward()
+                torch.nn.utils.clip_grad_norm(model_actor.parameters(), 0.5)
+                actor_optim.step()
 
-            # train value network
-            critic_optim.zero_grad()
-            target_values = qs
-            values = model_critic([states_var_1, states_var_2])
-            criterion = nn.MSELoss()
-            critic_network_loss = criterion(values, target_values)
-            critic_network_loss.backward()
-            torch.nn.utils.clip_grad_norm(model_critic.parameters(), 0.5)
-            critic_optim.step()
+                # train value network
+                critic_optim.zero_grad()
+                target_values = qs
+                # values = model_critic([states_var_screen, states_var_minimap, states_var_player])
+                criterion = nn.MSELoss()
+                critic_network_loss = criterion(vs, target_values)
+                critic_network_loss.backward()
+                torch.nn.utils.clip_grad_norm(model_critic.parameters(), 0.5)
+                critic_optim.step()
 
-            actor_network_losses.append(float(actor_network_loss.detach().numpy()))
-            critic_network_losses.append(float(critic_network_loss.cpu().detach().numpy()))
+                actor_network_losses.append(float(actor_network_loss.detach().numpy()))
+                critic_network_losses.append(float(critic_network_loss.cpu().detach().numpy()))
 
-            print('episode: {},   loss of actor: {},   loss of critic: {},   score: {}'.format(e, np.sum(actor_network_losses), np.sum(critic_network_losses), score))
+                print('episode: {},   loss of actor: {},   loss of critic: {},   score: {}'.format(e, np.sum(actor_network_losses), np.sum(critic_network_losses), score))
 
-        else:
-            continue
-        if e % 100 == 0:
-            save_path = ['./save/Simple64-a2c_actor-epi{}.pt'.format(e), './save/Simple64-a2c_critic-epi{}.pt'.format(e)]
-            agent.save(save_path)
-            # torch.save(model_actor, './save/Simple64-a2c_actor-epi{}.pt'.format(e))
-            # torch.save(model_critic, './save/Simple64-a2c_critic-epi{}.pt'.format(e))
-            history.append([e, agent.states, agent.actions, agent.rewards])
-            np.savez_compressed("./logs/a2c_e{}.npz".format(e))
+            else:
+                continue
+
+            condition1 = e <= 995 and e % 100 == 0
+            condition2 = e > 995
+            if condition1 or condition2:
+                save_path = ['./save/a2c/Simple64-a2c_actor-epi{}.pt'.format(e), './save/a2c/Simple64-a2c_critic-epi{}.pt'.format(e)]
+                agent.save(save_path)
+                # torch.save(model_actor, './save/Simple64-a2c_actor-epi{}.pt'.format(e))
+                # torch.save(model_critic, './save/Simple64-a2c_critic-epi{}.pt'.format(e))
+                history.append([e, agent.states, agent.actions, agent.rewards])
+                np.savez_compressed("./logs/a2c_e{}.npz".format(e))
+            done = False
 
     print('train complete')
 

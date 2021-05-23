@@ -116,11 +116,11 @@ class A2CAgent:
         self.update_epsilon()
 
     def load(self, name):
-        if self.model:
-            self.model[0].load_state_dict(torch.load(name[0]))
-            self.model[1].load_state_dict(torch.load(name[1]))
+        if self.model and self.value_model:
+            self.model.load_state_dict(torch.load(name[0]))
+            self.value_model.load_state_dict(torch.load(name[1]))
 
     def save(self, name):
-        if self.model:
-            torch.save(self.model[0].state_dict(), name[0])
-            torch.save(self.model[1].state_dict(), name[1])
+        if self.model and self.value_model:
+            torch.save(self.model.state_dict(), name[0])
+            torch.save(self.value_model.state_dict(), name[1])
