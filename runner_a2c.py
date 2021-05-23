@@ -199,8 +199,11 @@ with sc2_env.SC2Env(
         ensure_available_actions=ensure_available_actions,
         disable_fog=disable_fog
 ) as env:
-    # if model and Path(Path(os.getcwd()) / 'save' / 'Simple64-a2c.h5').is_file():
-    #     agent.load("./save/Simple64-rand.pt")
+    path_lst = os.listdir('./save')
+    max_episode_in_last_play = max([int(p.split('.')[0].split('i')[-1]) for p in path_lst])
+    load_path = [Path(Path(os.getcwd()) / 'save' / 'Simple64-a2c_actor-epi{}.pt'.format(max_episode_in_last_play)), Path(Path(os.getcwd()) / 'save' / 'Simple64-a2c_critic-epi{}.pt'.format(max_episode_in_last_play))]
+    if model and load_path[0].is_file() and load_path[1].is_file():
+        agent.load(load_path)
 
     done = False
     history = []
@@ -208,13 +211,20 @@ with sc2_env.SC2Env(
     critic_optim = torch.optim.Adam(model_critic.parameters(), lr=0.01)
     actor_optim = torch.optim.Adam(model_critic.parameters(), lr=0.01)
 
-    for e in range(MAX_EPISODES-1):
+    for e in range(max_episode_in_last_play, max_episode_in_last_play+MAX_EPISODES-1):
         obs = env.reset()
 
         score = 0
         score_pre = 0
         state = get_state(obs[0])
         time = 0
+
+        agent.states = []
+        agent.next_states = []
+        agent.rewards = []
+        agent.actions = []
+        agent.points = []
+        agent.score = []
 
         for time in range(MAX_STEPS-1):
 
@@ -239,7 +249,7 @@ with sc2_env.SC2Env(
                 done = True
                 if env._controllers[0].status.value == 5:           # 战败
                     reward = reward / 1000
-                    # break
+                    break
                     
             if time == MAX_STEPS-1:
                 done = True
@@ -254,18 +264,20 @@ with sc2_env.SC2Env(
 
             state = next_state
             obs = next_obs
-            if done:
-                print("episode: {}/{}, score: {}".format(e, MAX_EPISODES, score))
-                # if score_pre < score:
-                #     score_pre = score
-                done = False
+            # if done:
+            #     print("episode: {}/{}, score: {}".format(e, MAX_EPISODES, score))
+            #     # if score_pre < score:
+            #     #     score_pre = score
+            #     done = False
 
             score += reward
             # time += 1
 
         # history.append(model)
 
-        if len(agent.states) > 2*num_samples:
+        # if len(agent.states) > 2*num_samples:
+        if done:
+
             actor_network_losses = []
             critic_network_losses = []
 
@@ -314,19 +326,17 @@ with sc2_env.SC2Env(
             critic_network_losses.append(float(critic_network_loss.cpu().detach().numpy()))
 
             print('episode: {},   loss of actor: {},   loss of critic: {},   score: {}'.format(e, np.sum(actor_network_losses), np.sum(critic_network_losses), score))
-            agent.states = []
-            agent.next_states = []
-            agent.rewards = []
-            agent.actions = []
-            agent.points = []
-            agent.score = []
+
         else:
             continue
         if e % 100 == 0:
-            torch.save(model_actor, './save/Simple64-a2c_actor-epi{}.pt'.format(e))
-            torch.save(model_critic, './save/Simple64-a2c_critic-epi{}.pt'.format(e))
-    torch.save(model_actor, './save/Simple64-a2c_actor.pt')
-    torch.save(model_critic, './save/Simple64-a2c_critic.pt')
+            save_path = ['./save/Simple64-a2c_actor-epi{}.pt'.format(e), './save/Simple64-a2c_critic-epi{}.pt'.format(e)]
+            agent.save(save_path)
+            # torch.save(model_actor, './save/Simple64-a2c_actor-epi{}.pt'.format(e))
+            # torch.save(model_critic, './save/Simple64-a2c_critic-epi{}.pt'.format(e))
+            history.append([e, agent.states, agent.actions, agent.rewards])
+            np.savez_compressed("./logs/a2c_e{}.npz".format(e))
+
     print('train complete')
 
 
