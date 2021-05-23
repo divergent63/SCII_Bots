@@ -97,7 +97,7 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/runner_a2c.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="775">
+            <state relative-caret-position="2941">
               <caret line="337" column="63" lean-forward="true" selection-start-line="337" selection-start-column="63" selection-end-line="337" selection-end-column="63" />
             </state>
           </provider>
@@ -222,6 +222,9 @@
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\software\python_prj\SCII\SCII_Bots\temp" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="D:\software\python_prj\SCII\SCII_Bots" />
     </key>
@@ -350,12 +353,12 @@
       <workItem from="1621492810598" duration="38109000" />
       <workItem from="1621619754968" duration="7908000" />
       <workItem from="1621664828091" duration="38237000" />
-      <workItem from="1621738392605" duration="964000" />
+      <workItem from="1621738392605" duration="1357000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="102797000" />
+    <option name="totallyTimeSpent" value="103190000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="2062" height="1166" extended-state="6" />
@@ -792,7 +795,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/runner_a2c.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="775">
+        <state relative-caret-position="2941">
           <caret line="337" column="63" lean-forward="true" selection-start-line="337" selection-start-column="63" selection-end-line="337" selection-end-column="63" />
         </state>
       </provider>
