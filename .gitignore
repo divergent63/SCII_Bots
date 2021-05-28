@@ -136,3 +136,7 @@ dmypy.json
 ./temp
 .temp/
 temp/
+
+./save
+.save/
+save/
