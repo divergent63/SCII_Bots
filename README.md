@@ -65,7 +65,7 @@ python runner.py
 
 ------
 
-Train an A2C agent to play the game with 
+Train an A2C agent to play the game with （Coming Soon）
 
 ```powershell
 python runner_a2c.py
