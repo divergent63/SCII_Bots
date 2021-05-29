@@ -5,7 +5,7 @@ Several agents able to play *[StarCraft II]((https://starcraft2.com/))* will be 
 
 
 
-And finally,
+And
 
 <u>***En Taro Zeratul !!!***</u>
 
