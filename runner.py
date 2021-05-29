@@ -1,9 +1,8 @@
+
 from pysc2.lib import actions, features, units
 
 from pysc2.env import sc2_env, run_loop, available_actions_printer
 from pysc2 import maps
-from absl import app, logging
-
 
 import sc2
 from sc2 import run_game, maps, Race, Difficulty, position
@@ -12,22 +11,20 @@ from sc2.constants import NEXUS, PROBE, PYLON, ASSIMILATOR, GATEWAY, \
     CYBERNETICSCORE, STALKER, STARGATE, VOIDRAY, OBSERVER, ROBOTICSFACILITY
 # from terran_agent import TerranAgent
 
-import random
-from pathlib import Path
-
-import os, sys
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-
 # from random_agent import RandomAgent
 # from network import FullyConv
 # from utils import get_state, get_action_v2
 
-from absl import flags
+from pathlib import Path
+from absl import app, logging, flags
 
+import random
 import math
-import numpy as np
+import os, sys
 
+sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+
+import numpy as np
 
 seed = 500
 np.random.seed(seed)
@@ -45,12 +42,6 @@ _QUEUED = [1]
 EPS_START = 0.9
 EPS_END = 0.025
 EPS_DECAY = 2500
-
-# define our actions
-# it can choose to move to
-# the beacon or to do nothing
-# it can select the marine or deselect
-# the marine, it can move to a random point
 
 _PLAYER_RELATIVE = features.SCREEN_FEATURES.player_relative.index
 _PLAYER_ID = features.SCREEN_FEATURES.player_id.index
@@ -168,7 +159,7 @@ def get_state(obs):
 
 
 def to_yx(point):
-    """transform a scalar from [0;4096] to a (y,x) coordinate in 64,64"""
+    """transform a scalar from [0;4095] to a (y,x) coordinate in [0:63,0:63]"""
     return point % 64, (point - (point % 64)) / 64
 
 
@@ -245,16 +236,20 @@ def get_action_v3(id_action, point, obs, num_dict=None):
             # num_dict["workers"] += 1
 
     elif smart_action == ACTION_COLLECT_RESOUCES:
+        # TODO: Warning about "必须以资源为目标"
         unit_type = obs.observation['feature_screen'][_UNIT_TYPE]
         scv_y, scv_x = (unit_type == units.Terran.SCV).nonzero()
-        # mineral_y, mineral_x = (unit_type == units.Neutral.MineralField).nonzero()
-        mineral_y, mineral_x = (unit_type == _NEUTRAL_BATTLESTATIONMINERALFIELD).nonzero()
+        mineral_y, mineral_x = (unit_type == units.Neutral.MineralField).nonzero()
+        # mineral_y, mineral_x = (unit_type == _NEUTRAL_BATTLESTATIONMINERALFIELD).nonzero()
 
         if _COLLECT_RESOURCES in obs.observation['available_actions']:
             if mineral_y.any():
-                i = random.randint(0, len(mineral_y) - 1)
-                target = [mineral_y[i], mineral_y[i]]
-
+                i = random.randint(0, len(scv_y) - 1)
+                # target = (mineral_y[i], mineral_y[i])
+                # target = (mineral_y.mean(), mineral_y.mean())
+                # target = (scv_y.mean(), scv_x.mean())
+                target = (scv_y[i], scv_x[i])
+                # target = (11, 16)
                 func = actions.FunctionCall(_COLLECT_RESOURCES, [_NOT_QUEUED, target])
 
     elif smart_action == ACTION_BUILD_SUPPLY_DEPOT:
@@ -360,7 +355,7 @@ def get_action_v3(id_action, point, obs, num_dict=None):
             # for i in range(0, len(enemy_y)):
             marines_cnt = num_dict["marines"]
 
-            if len(obs.observation['multi_select']) and marines_cnt > 12:
+            if len(obs.observation['multi_select']) and marines_cnt > 12 and num_dict['attack_cnt'] < 2:
                 # if obs.observation['multi_select'][0][0] != _TERRAN_SCV and _ATTACK_MINIMAP in obs.observation["available_actions"]:
                 if _ATTACK_MINIMAP in obs.observation["available_actions"]:
                     # if _ATTACK_MINIMAP in obs.observation["available_actions"]:
@@ -370,8 +365,7 @@ def get_action_v3(id_action, point, obs, num_dict=None):
                         func = actions.FunctionCall(_ATTACK_MINIMAP, [_NOT_QUEUED, target])
                         num_dict['marines'] = 0
                         num_dict['attack_cnt'] += 1
-            elif num_dict['attack_cnt'] >= 2:
-                if len(obs.observation['multi_select']) and marines_cnt > 3:
+            elif num_dict['attack_cnt'] >= 2 and len(obs.observation['multi_select']) and marines_cnt > 3:
                     # if obs.observation['multi_select'][0][0] != _TERRAN_SCV and _ATTACK_MINIMAP in obs.observation["available_actions"]:
                     if _ATTACK_MINIMAP in obs.observation["available_actions"]:
                         # if _ATTACK_MINIMAP in obs.observation["available_actions"]:
@@ -401,6 +395,7 @@ def get_action_v3(id_action, point, obs, num_dict=None):
         try:
             return func, smart_action, num_dict
         except UnboundLocalError:
+            num_dict['attack_cnt'] -= 1
             print(str(smart_action) + " " + str(point) + " is not an available action")
             return get_action_v3(action_from_id[4], point, obs, num_dict)
 
@@ -464,7 +459,6 @@ def get_action_v3(id_action, point, obs, num_dict=None):
 def main(unused_argv):
 
     viz = True
-    save_replay = False
     replay_prefix = 'D:/software/python_prj/SCII/SCII_Bots/replays/deterministic_sequence'
     replay_dir = '/replays'
     real_time = False
@@ -482,6 +476,7 @@ def main(unused_argv):
                          sc2_env.Bot(sc2_env.Race.protoss, sc2_env.Difficulty.very_easy)
                          ],
                 visualize=viz, agent_interface_format=sc2_env.AgentInterfaceFormat(
+                    use_raw_units=True,
                     feature_dimensions=sc2_env.Dimensions(
                         screen=64,
                         minimap=64)),
@@ -492,7 +487,7 @@ def main(unused_argv):
                 disable_fog=disable_fog,
                 save_replay_episodes=1,
                 replay_prefix=replay_prefix,
-                replay_dir=replay_dir
+                replay_dir=replay_dir,
         ) as env:
 
             done = False
