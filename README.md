@@ -75,7 +75,7 @@ python runner_a2c.py
 
 ##### details of neural agent
 
-The structure of a2c neural agent is constructed as follows with pytorch 1.2.0.
+The structure of neural agent is constructed as follows with pytorch 1.2.0.
 
 <img src="assets/a2cagent-1621745942426.png" style="zoom:10%"/>
 
