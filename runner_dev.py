@@ -178,10 +178,13 @@ def get_action_v3(id_action, point, obs, num_dict=None):
     unit_type = obs.observation['feature_screen'][_UNIT_TYPE]
 
     depot_y, depot_x = (unit_type == _TERRAN_SUPPLY_DEPOT).nonzero()
-    supply_depot_count = supply_depot_count = 1 if depot_y.any() else 0
+    supply_depot_exist = 1 if depot_y.any() else 0
 
     barracks_y, barracks_x = (unit_type == _TERRAN_BARRACKS).nonzero()
-    barracks_count = 1 if barracks_y.any() else 0
+    barracks_exist = 1 if barracks_y.any() else 0
+
+    engbays_y, engbays_x = (unit_type == _TERRAN_ENGINEERINGBAY).nonzero()
+    engbays_exist = 1 if engbays_y.any() else 0
 
     supply_limit = obs.observation['player'][4]
     army_supply = obs.observation['player'][5]
@@ -193,8 +196,8 @@ def get_action_v3(id_action, point, obs, num_dict=None):
     killed_building_score = obs.observation['score_cumulative'][6]
 
     current_state = np.zeros(20)
-    current_state[0] = supply_depot_count
-    current_state[1] = barracks_count
+    current_state[0] = supply_depot_exist
+    current_state[1] = barracks_exist
     current_state[2] = supply_limit
     current_state[3] = army_supply
 
@@ -246,7 +249,7 @@ def get_action_v3(id_action, point, obs, num_dict=None):
         # mineral_y, mineral_x = (unit_type == _NEUTRAL_BATTLESTATIONMINERALFIELD).nonzero()
 
         if _COLLECT_RESOURCES in obs.observation['available_actions'] and idle_workers_cnt > 0:
-            if mineral_y.any():
+            if mineral_y.any() and scv_y.any():
                 i = random.randint(0, len(scv_y) - 1)
                 # target = (mineral_y[i], mineral_y[i])
                 # target = (mineral_y.mean(), mineral_y.mean())
@@ -256,19 +259,18 @@ def get_action_v3(id_action, point, obs, num_dict=None):
                 func = actions.FunctionCall(_COLLECT_RESOURCES, [_NOT_QUEUED, target])
 
     elif smart_action == ACTION_BUILD_SUPPLY_DEPOT:
-        deports_cnt = num_dict["supply_deports"]
-        if _BUILD_SUPPLY_DEPOT in obs.observation['available_actions'] and deports_cnt < 4:
+        if _BUILD_SUPPLY_DEPOT in obs.observation['available_actions']:
             unit_type = obs.observation['feature_screen'][_UNIT_TYPE]
             unit_y, unit_x = (unit_type == _TERRAN_COMMANDCENTER).nonzero()
 
             if unit_y.any():
-                if num_dict["supply_deports"] == 0:
+                if supply_limit < 23:
                     target = (31, 8)
-                elif num_dict["supply_deports"] == 1:
+                elif supply_limit < 31:
                     target = (26, 8)
-                elif num_dict["supply_deports"] == 2:
+                elif supply_limit < 39:
                     target = (21, 8)
-                elif num_dict["supply_deports"] == 3:
+                elif supply_limit < 47:
                     target = (16, 8)
                 else:
                     target = to_yx(point)
@@ -276,10 +278,8 @@ def get_action_v3(id_action, point, obs, num_dict=None):
                 func = actions.FunctionCall(_BUILD_SUPPLY_DEPOT, [_NOT_QUEUED, target])
 
                 try:
-                    num_dict["supply_deports"] += 1
                     return func, smart_action, num_dict
                 except UnboundLocalError:
-                    num_dict["supply_deports"] -= 1
                     print(str(smart_action) + " " + str(point) + " is not an available action")
                     return get_action_v3(action_from_id[0], point, obs, num_dict)
 
@@ -288,7 +288,7 @@ def get_action_v3(id_action, point, obs, num_dict=None):
             unit_type = obs.observation['feature_screen'][_UNIT_TYPE]
             unit_y, unit_x = (unit_type == _TERRAN_COMMANDCENTER).nonzero()
 
-            if unit_y.any() and num_dict['barracks'] < 3:
+            if unit_y.any() and num_dict["barracks"] < 3:
                 # target = to_yx(point)
                 if num_dict["barracks"] == 0:
                     target = (56, 18)
@@ -367,7 +367,6 @@ def get_action_v3(id_action, point, obs, num_dict=None):
                         # target = to_yx(point)           # TODO:
                         func = actions.FunctionCall(_ATTACK_MINIMAP, [_NOT_QUEUED, target])
                         # num_dict['marines'] = 0
-                        num_dict['attack_cnt'] += 1
             elif num_dict['attack_cnt'] >= 2 and len(obs.observation['multi_select']) and army_cnt >= 3:
                     # if obs.observation['multi_select'][0][0] != _TERRAN_SCV and _ATTACK_MINIMAP in obs.observation["available_actions"]:
                     if _ATTACK_MINIMAP in obs.observation["available_actions"]:
@@ -377,7 +376,6 @@ def get_action_v3(id_action, point, obs, num_dict=None):
                             # target = to_yx(point)           # TODO:
                             func = actions.FunctionCall(_ATTACK_MINIMAP, [_NOT_QUEUED, target])
                             # num_dict['marines'] = 0
-                            num_dict['attack_cnt'] += 1
             # else:
             #     if len(obs.observation['multi_select']):
             #         # if obs.observation['multi_select'][0][0] != _TERRAN_SCV and _ATTACK_MINIMAP in obs.observation["available_actions"]:
@@ -396,6 +394,7 @@ def get_action_v3(id_action, point, obs, num_dict=None):
                     target = to_yx(point)
                     func = actions.FunctionCall(_ATTACK_MINIMAP, [_NOT_QUEUED, target])
         try:
+            num_dict['attack_cnt'] += 1
             return func, smart_action, num_dict
         except UnboundLocalError:
             num_dict['attack_cnt'] -= 1
@@ -405,7 +404,7 @@ def get_action_v3(id_action, point, obs, num_dict=None):
     elif smart_action == ACTION_BUILD_ENGBAY:
         engbays_cnt = num_dict["engbays"]
 
-        if _BUILD_ENG_BAY in obs.observation['available_actions'] and engbays_cnt == 0:
+        if _BUILD_ENG_BAY in obs.observation['available_actions'] and not engbays_exist:
             unit_type = obs.observation['feature_screen'][_UNIT_TYPE]
             unit_y, unit_x = (unit_type == _TERRAN_COMMANDCENTER).nonzero()
 
@@ -414,10 +413,10 @@ def get_action_v3(id_action, point, obs, num_dict=None):
                 target = (38, 44)
                 func = actions.FunctionCall(_BUILD_ENG_BAY, [_NOT_QUEUED, target])
         try:
-            num_dict["engbays"] += 1
+            # num_dict["engbays"] += 1
             return func, smart_action, num_dict
         except UnboundLocalError:
-            num_dict["engbays"] -= 1
+            # num_dict["engbays"] -= 1
             print(str(smart_action) + " " + str(point) + " is not an available action")
             return get_action_v3(action_from_id[0], point, obs, num_dict)
 
@@ -467,9 +466,10 @@ def main(unused_argv):
     real_time = False
     ensure_available_actions = True
     disable_fog = True
-    steps_per_episode = 0  # 0 actually means unlimited
+    game_steps_per_episode = 5000  # 0 actually means unlimited
     MAX_EPISODES = 1
-    MAX_STEPS = 5000
+    MAX_STEPS = 8000
+
     try:
         # run trajectories and train
         with sc2_env.SC2Env(
@@ -491,22 +491,30 @@ def main(unused_argv):
                 save_replay_episodes=1,
                 replay_prefix=replay_prefix,
                 replay_dir=replay_dir,
+                # game_steps_per_episode=game_steps_per_episode
         ) as env:
 
             done = False
             history = []
 
+            obs = env.reset()
+
+            score = 0
+            score_pre = 0
+            state = get_state(obs[0])
+            algo = q_learning.DeepQLearning(action_from_id.values(), obs)
+
             for e in range(MAX_EPISODES):
-                obs = env.reset()
+                if e > 0:
+                    obs = env.reset()
 
                 score = 0
                 score_pre = 0
-                state = get_state(obs[0])
 
                 control_seq = []
                 control_idx = 1
 
-                num_dict = {"workers": 0, "idle_workers": 0, "supply_deports": 0, "barracks": 0, "engbays": 0,
+                num_dict = {"workers": 0, "idle_workers": 0, "barracks": 0, "engbays": 0,
                             # "marines": 0,
                             "missile_turrets": 0, 'attack_cnt': 0}
                 for time in range(MAX_STEPS):
@@ -514,21 +522,21 @@ def main(unused_argv):
                     if e == 0 and time == 0:
                         init = True
 
-                    a, point = action_from_id[np.random.choice(len(action_from_id), 1)[0]], np.random.randint(4096)
-                    # # TODO: build supply deport with deterministic time sequence
-                    # point = np.random.randint(4096)
-                    # a = action_from_id[control_idx]
-                    # # control_seq.append(action_from_id[control_idx])
-                    # control_seq.append(action_from_id[control_idx+1])
-                    # if len(control_seq) > 0:
-                    #     a = control_seq[-1]
-                    func, act_a, new_num_dict = get_action_v3(a, point, obs=obs[0], num_dict=num_dict)
-                    # if act_a == a:
-                    #     control_seq.pop()
-                    #     control_idx += 1
+                    state_model = [np.array(obs[0].observation.feature_screen),
+                                   np.array(obs[0].observation.feature_minimap), np.array(obs[0].observation.player)]
+                    # TODO: state_model = [np.array(obs[0].observation.feature_screen), np.array(obs[0].observation.feature_minimap), np.array(obs[0].observation.player), np.array(obs[0].observation.last_actions)]
+
+                    action, point = action_from_id[np.random.choice(len(action_from_id), 1)[0]], np.random.randint(4096)
+                    func, actual_action, new_num_dict = get_action_v3(action, point, obs=obs[0], num_dict=num_dict)
+
+                    # preds = algo.choose_action(state_model, init)
+                    # action, point = \
+                    # np.random.choice(list(action_from_id.values()), 1, p=preds[0].squeeze(0).cpu().detach().numpy())[0], \
+                    # np.random.choice(4096, 1, p=preds[1].squeeze(0).cpu().detach().numpy())[0]
+                    # func, actual_action, new_num_dict = get_action_v3(action, point, obs=obs[0], num_dict=num_dict)
 
                     next_obs = env.step([func])
-                    print(act_a, point)
+                    print(actual_action, point)
 
                     next_state = get_state(next_obs[0])
                     num_dict = new_num_dict
@@ -537,12 +545,19 @@ def main(unused_argv):
 
                     if env._controllers and env._controllers[0].status.value != 3:
                         done = True
+
+                        if env._obs[0].player_result[0].result == 1:           # player0(unknown)胜利
+                            reward = reward + 10
+                        elif env._obs[0].player_result[0].result == 2:           # player0(unknown)战败
+                            reward = reward
+
                     if time == MAX_STEPS - 1:
                         done = True
 
                     state = next_state
                     obs = next_obs
                     if done:
+                        num_dict["barracks"] = 0
                         print("episode: {}/{}, score: {}".format(e, MAX_EPISODES, score))
                         if score_pre < score:
                             score_pre = score
@@ -553,7 +568,7 @@ def main(unused_argv):
                         if score_pre < score:
                             # save agent model
                             history.append(
-                                [e, time, state, next_state, a, act_a, point, reward, score, done]
+                                [e, time, state, next_state, action, actual_action, point, reward, score, done]
                             )
 
                     score += reward
