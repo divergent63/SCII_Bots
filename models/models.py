@@ -382,7 +382,8 @@ class SimpleConvNet_val(nn.Module):
         self.fc1 = nn.Linear(16 * 13 * 13, 32)
         self.fc2 = nn.Linear(43, 16)
 
-        self.fc_o = nn.Linear(16, output_size)  # len(categorical_actions)
+        self.fc_o1 = nn.Linear(16, output_size[0])  # len(categorical_actions)
+        self.fc_o2 = nn.Linear(16, output_size[1])  # len(categorical_actions)
 
     def forward(self, input_x):
         input0 = torch.unsqueeze(Variable(torch.tensor(input_x[0])), 0) if len(input_x[0].shape) == 3 else Variable(
@@ -405,8 +406,12 @@ class SimpleConvNet_val(nn.Module):
 
         x = self.fc2(torch.cat([x, input2.float()], 1))
 
-        xo = self.fc_o(x)
+        xo1 = self.fc_o1(x)
+        xo2 = self.fc_o2(x)
 
-        v = torch.relu(xo)
-        return v
+        v1 = torch.relu(xo1)
+        v2 = torch.relu(xo2)
+
+        # v = torch.softmax(xo, 1)
+        return [v1, v2]
 
