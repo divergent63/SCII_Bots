@@ -52,11 +52,9 @@ class QLearningTable:
 
 
 class DeepQLearning:
-    def __init__(self, actions, learning_rate=0.01, reward_decay=0.9):
-        self.actions = actions
+    def __init__(self, model_path, learning_rate=0.01, reward_decay=0.9):
         self.learning_rate = learning_rate
         self.reward_decay = reward_decay
-        self.q_table = pd.DataFrame(columns=self.actions, dtype=np.float64)
 
         self.feature_screen = 27
         self.feature_minimap = 11
@@ -70,9 +68,9 @@ class DeepQLearning:
 
         self.criterion = nn.MSELoss()
 
-        load_path = Path(Path(os.getcwd()) / 'save' / 'dqn' / 'Simple64-dqn-best.pt')
-        if load_path.exists():
-            self.model.load_state_dict(torch.load(load_path))
+        # model_path = Path(Path(os.getcwd()) / 'save' / 'dqn' / 'Simple64-dqn-best.pt')
+        if model_path.exists():
+            self.model.load_state_dict(torch.load(model_path))
 
         self. critic_optim = torch.optim.Adam(self.model.parameters(), lr=0.01)
 

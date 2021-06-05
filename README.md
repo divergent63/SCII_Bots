@@ -55,6 +55,8 @@ $$
 $$
 need further adjust.
 
+use `*spent_minerals*` to reward the action; use `*killed_value_units + killed_value_structures*` to reward attack point.
+
 ------
 
 Run the environment test script as follows with
@@ -64,6 +66,14 @@ python runner.py
 ```
 
 ------
+
+Train an DQN agent to play the game with 
+
+```powershell
+python runner_dqn.py
+```
+
+
 
 Train an A2C agent to play the game with （Coming Soon）
 
@@ -75,11 +85,19 @@ python runner_a2c.py
 
 ##### details of neural agent
 
-The structure of a2c neural agent is constructed as follows with pytorch 1.2.0.
+The structure of **DQN** neural agent is constructed as follows with pytorch 1.2.0.
+
+<img src="assets\dqnagent-1621745942426.png" style="zoom:20%"/>
+
+
+
+The structure of **A2C** neural agent is constructed as follows with pytorch 1.2.0.
 
 <img src="assets/a2cagent-1621745942426.png" style="zoom:10%"/>
 
+The neural network model takes three different types of input tensors  include 27 channels screen features, 11channels mini-map features and 11 channels player information features. The outputs contains two types values such as action values and values of attack position. 
 
+Also, 
 
 ### evaluating
 
