@@ -1,4 +1,3 @@
-# This runner is based on actions.RAW_FUNCTIONS (.\anaconda\a3_64\envs\py37_clone_v8\Lib\site-packages\pysc2\lib\actions.py)
 import random
 import numpy as np
 import pandas as pd
@@ -69,7 +68,7 @@ class DeepQLearning:
         self.criterion = nn.MSELoss()
 
         # model_path = Path(Path(os.getcwd()) / 'save' / 'dqn' / 'Simple64-dqn-best.pt')
-        if model_path.exists():
+        if Path(model_path).exists():
             self.model.load_state_dict(torch.load(model_path))
 
         self. critic_optim = torch.optim.Adam(self.model.parameters(), lr=0.01)
@@ -112,10 +111,11 @@ class DeepQLearning:
             print("learned actions")
             return v
 
-    def learn(self, history_raw, id_from_actions):
+    def learn(self, history_raw, id_from_actions, epochs=3):
         batch_size = len(history_raw)//40
+        critic_network_loss_lst = []
         # history_raw: [e, time, state_model, state_model_next, action, actual_action, last_action, point, reward, score, done]
-        for epoch in range(3):
+        for epoch in range(epochs):
             history = random.sample(history_raw, batch_size)
             e, time, state_model, state_model_next, action, actual_action, last_action, point, reward, score, done = zip(*history)
             # for _ in range(len(history)):
@@ -156,12 +156,14 @@ class DeepQLearning:
             # values = model_critic([states_var_screen, states_var_minimap, states_var_player])
             critic_network_loss = self.criterion(q_predict[0], target_values) + self.criterion(q_predict[1], target_values_p)            # + criterion(q_predict[1], target_values)
             print('critic_network_loss:  \n', critic_network_loss, '\n')
+            critic_network_loss_lst.append(critic_network_loss)
             
             self.critic_optim.zero_grad()
             critic_network_loss.backward()
             # torch.nn.utils.clip_grad_norm(self.model.parameters(), 0.5)
             self.critic_optim.step()
-
+        return critic_network_loss_lst
+    
     def save(self, name):
         if self.model:
             torch.save(self.model.state_dict(), name)

@@ -1,4 +1,5 @@
-# -*- coding: UTF-8 -*-
+# -*- coding: UTF-8 -*-#
+# This runner is based on actions.FUNCTIONS (.\anaconda\a3_64\envs\py37_clone_v8\Lib\site-packages\pysc2\lib\actions.py)
 
 from pysc2.lib import actions, features, units
 
@@ -20,13 +21,14 @@ from absl import app, logging, flags
 
 import random
 import math
+import pickle
 import os, sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
 import numpy as np
 
-seed = 1
+seed = 500
 np.random.seed(seed)
 
 _MOVE_RAND = 1000
@@ -159,7 +161,7 @@ def get_state(obs):
 
 def to_yx(point):
     """transform a scalar from [0;4095] to a (y,x) coordinate in [0:63,0:63]"""
-    return point % 64, (point - (point % 64)) / 64
+    return int(point % 64), int((point - (point % 64)) / 64)
 
 
 def transformLocation(obs, x, y):
@@ -225,6 +227,7 @@ def get_action_v3(id_action, point, obs, num_dict=None):
     # if '_' in smart_action:
     #     smart_action, x, y = smart_action.split('_')
 
+    # (obs.observation['feature_minimap'][_PLAYER_RELATIVE] == _PLAYER_HOSTILE).nonzero()
     if smart_action == ACTION_SELECT_SCV:
         unit_type = obs.observation['feature_screen'][_UNIT_TYPE]
         unit_y, unit_x = (unit_type == _TERRAN_SCV).nonzero()
@@ -476,7 +479,7 @@ def main(unused_argv):
     real_time = False
     ensure_available_actions = True
     disable_fog = True
-    train_mode = True           # True  False
+    train_mode = False           # True  False
     game_steps_per_episode = 5000  # 0 actually means unlimited
     if train_mode == True:
         MAX_EPISODES = 100
@@ -522,7 +525,7 @@ def main(unused_argv):
                 max_episode_in_last_play = max([int(p.split('.')[0].split('i')[-1]) for p in path_lst])
                 load_path = Path(Path(os.getcwd()) / 'save' / 'a2c' / 'Simple64-a2c_actor-epi{}.pt'.format(max_episode_in_last_play))
             else:
-                load_path = None
+                load_path = 'none'
             algo = q_learning.DeepQLearning(load_path)
 
             logs_path_lst = os.listdir('./logs')
@@ -591,7 +594,7 @@ def main(unused_argv):
                             reward = list(np.array(reward) + 10000)
                         elif env._obs[0].player_result[0].result == 2:  # player0(unknown)战败
                             reward = list(np.array(reward) - 10000)
-                            dataset = []
+                            # dataset = []
 
                     if time == MAX_STEPS - 1:
                         done = True
@@ -635,7 +638,10 @@ def main(unused_argv):
                         if train_mode:
                             algo.learn(dataset, id_from_actions)
 
-                        np.savez_compressed('./logs/history_dqn_sequence_bp{}.npz'.format(str(batch_pool_idx)), np.array(dataset))
+                        # np.savez_compressed('./logs/history_dqn_sequence_bp{}.npz'.format(str(batch_pool_idx)), np.array(dataset))
+                        # 保存为pickle文件
+                        with open('./logs/history_dqn_sequence_bp{}.pkl'.format(str(batch_pool_idx)), "wb") as f:
+                            pickle.dump(np.array(dataset), f)
                         dataset = []
                         batch_pool_idx += 1
 

@@ -140,3 +140,7 @@ temp/
 ./save
 .save/
 save/
+
+./logs
+.logs/
+logs/
