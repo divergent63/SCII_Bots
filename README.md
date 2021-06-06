@@ -91,7 +91,7 @@ python runner_a2c.py
 
 The structure of **DQN** neural agent is constructed as follows with pytorch 1.2.0.
 
-<img src="assets\dqnagent-1621745942426.png" style="zoom:20%"/>
+<img src="assets\dqnagent-1621745942426.png" style="zoom:15%"/>
 
 
 
