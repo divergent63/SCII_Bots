@@ -51,6 +51,9 @@ class QLearningTable:
 
 
 class DeepQLearning:
+    """
+    Natural-DQN with self.copy() after 'done == True'
+    """
     def __init__(self, model_path, learning_rate=0.01, reward_decay=0.9):
         self.learning_rate = learning_rate
         self.reward_decay = reward_decay
