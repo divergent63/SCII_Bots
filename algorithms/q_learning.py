@@ -62,7 +62,10 @@ class DeepQLearning:
 
         # model_p = models.SimpleConvNet_prob(input_size=[self.feature_screen, self.feature_minimap], output_size=[self.out_action, self.out_point])
         model_v = models.SimpleConvNet_val(input_size=[self.feature_screen, self.feature_minimap], output_size=[self.out_action, self.out_point])
+        model_v_process = models.SimpleConvNet_val(input_size=[self.feature_screen, self.feature_minimap], output_size=[self.out_action, self.out_point])
         self.model = model_v.cuda() if torch.cuda.is_available() else model_v
+        self.model_process = model_v_process.cuda() if torch.cuda.is_available() else model_v_process
+
         print('model:  \n', self.model)
 
         self.criterion = nn.MSELoss()
@@ -83,12 +86,12 @@ class DeepQLearning:
             p2 = Variable(torch.Tensor(
                 np.random.dirichlet(np.ones(self.out_point), size=1)).cuda() if torch.cuda.is_available() else torch.Tensor(
                 np.random.dirichlet(np.ones(self.out_point), size=1)))
-            print("explored actions")
+            # print("explored actions")
             return [p1, p2]
         else:
             # state.append(np.zeros((1, 1)))
-            preds = self.model(state)
-            print("learned actions")
+            preds = self.model_process(state)
+            # print("learned actions")
             # return self.action_from_id[np.random.choice(len(self.action_from_id), 1, p=preds[1][0])[0]], np.random.choice(len(self.action_from_id), 1, p=preds[2][0])[0]
             # return self.action_from_id[np.random.choice(len(self.action_from_id), 1, p=preds[0].cpu().detach().numpy())[0]], np.random.choice(4096, 1, p=preds[1].cpu().detach().numpy())[0]
             # return np.random.choice(list(self.action_from_id.values()), 1, p=preds[0].cpu().detach().numpy())[0], \
@@ -100,19 +103,19 @@ class DeepQLearning:
         if not init and ep < e_greedy:  # TODO: can't understand the probability matrix from uniform distribution --> SOLVED
             # return self.action_from_id[np.random.choice(len(self.action_from_id), 1)[0]], np.random.randint(4096)
             v1, v2 = np.reshape(np.random.rand(self.out_action), (1, self.out_action)), np.reshape(np.random.rand(self.out_point), (1, self.out_point))
-            print("explored actions")
+            # print("explored actions")
             return [
                 Variable(torch.Tensor(v1).float()).cuda() if torch.cuda.is_available() else Variable(torch.Tensor(v1).float()), 
                 Variable(torch.Tensor(v2).float()).cuda() if torch.cuda.is_available() else Variable(torch.Tensor(v2).float())
             ]
         else:
             # state.append(np.zeros((1, 1)))
-            v = self.model(state)
-            print("learned actions")
+            v = self.model_process(state)
+            # print("learned actions")
             return v
 
     def learn(self, history_raw, id_from_actions, epochs=3):
-        batch_size = len(history_raw)//40
+        batch_size = len(history_raw)//4
         critic_network_loss_lst = []
         # history_raw: [e, time, state_model, state_model_next, action, actual_action, last_action, point, reward, score, done]
         for epoch in range(epochs):
@@ -156,7 +159,7 @@ class DeepQLearning:
             # values = model_critic([states_var_screen, states_var_minimap, states_var_player])
             critic_network_loss = self.criterion(q_predict[0], target_values) + self.criterion(q_predict[1], target_values_p)            # + criterion(q_predict[1], target_values)
             print('critic_network_loss:  \n', critic_network_loss, '\n')
-            critic_network_loss_lst.append(critic_network_loss)
+            critic_network_loss_lst.append(float(critic_network_loss.detach().cpu().numpy()))
             
             self.critic_optim.zero_grad()
             critic_network_loss.backward()
@@ -167,3 +170,7 @@ class DeepQLearning:
     def save(self, name):
         if self.model:
             torch.save(self.model.state_dict(), name)
+
+    def copy(self):
+        for target_param, param in zip(self.model.parameters(), self.model_process.parameters()):
+            param.data.copy_(target_param.data)

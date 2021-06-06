@@ -50,10 +50,14 @@ PPS: PySC2 is very different with and more complex than [python-sc2](https://git
 **Action**: try to determine what to do and where to go to win the game. There are two types of the actions include several basic action (currently 11) and a coordinate position with 64*64 points.
 
 **Reward**: 
+
+<u>*version 1:*</u>
 $$
 (score + total\_value\_units + total\_value\_structures + 10*killed\_value\_units + 10*killed\_value\_structures + collected\_minerals + collected\_rate\_minerals + 5*spent\_minerals - 8*idle\_work\_time) * 10e-6
 $$
 need further adjust.
+
+<u>*version 2:*</u>
 
 use `*spent_minerals*` to reward the action; use `*killed_value_units + killed_value_structures*` to reward attack point.
 
