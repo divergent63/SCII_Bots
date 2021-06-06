@@ -61,12 +61,27 @@ need further adjust.
 
 use `*spent_minerals*` to reward the action; use `*killed_value_units + killed_value_structures*` to reward attack point.
 
+In summary,
+$$
+reward = [reward_a, reward_p]
+$$
+where
+$$
+reward_a = spent\_minerals * (10e^{-2})
+$$
+
+$$
+reward_p = killed\_value\_units + killed\_value\_structures
+$$
+
+In addition, the reward will adjusted further to simulate the returns from environment more precisely. 
+
 ------
 
 Run the environment test script as follows with
 
 ```powershell
-python runner.py
+python runner_basic_test.py
 ```
 
 ------
@@ -75,6 +90,12 @@ Train an DQN agent to play the game with
 
 ```powershell
 python runner_dqn.py
+```
+
+I also use the supervised value network to validate if the gradient update is worked, just run with
+
+```python
+python runner_nn_test.py
 ```
 
 
@@ -91,17 +112,19 @@ python runner_a2c.py
 
 The structure of **DQN** neural agent is constructed as follows with pytorch 1.2.0.
 
+The neural network model takes three different types of input tensors include 27 channels screen features, 11channels mini-map features and 11 channels player information features. 
+
+Also, two different functional models, named as operation model and warfare model, shared several layers of the whole network and the inputs. And the two models output action value and value of attack position respectively.
+
 <img src="assets\dqnagent-1621745942426.png" style="zoom:15%"/>
 
 
 
-The structure of **A2C** neural agent is constructed as follows with pytorch 1.2.0.
+The structure of **A2C** neural agent is constructed as follows with pytorch 1.2.0. (coming soon)
 
 <img src="assets/a2cagent-1621745942426.png" style="zoom:10%"/>
 
-The neural network model takes three different types of input tensors  include 27 channels screen features, 11channels mini-map features and 11 channels player information features. The outputs contains two types values such as action values and values of attack position. 
 
-Also, 
 
 ### evaluating
 

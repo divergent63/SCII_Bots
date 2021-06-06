@@ -524,7 +524,7 @@ def main(unused_argv):
             path_lst = os.listdir('./save/dqn')
             if len(path_lst) != 0:
                 max_episode_in_last_play = max([int(p.split('.')[0].split('i')[-1]) for p in path_lst])
-                load_path = Path(Path(os.getcwd()) / 'save' / 'a2c' / 'Simple64-a2c_actor-epi{}.pt'.format(max_episode_in_last_play))
+                load_path = Path(Path(os.getcwd()) / 'save' / 'dqn' / 'Simple64-dqn-epi{}.pt'.format(max_episode_in_last_play))
             else:
                 load_path = 'none'
             algo = q_learning.DeepQLearning(load_path)

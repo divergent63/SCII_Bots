@@ -18,6 +18,7 @@ import algorithms.q_learning as q_learning
 
 from pathlib import Path
 from absl import app, logging, flags
+from matplotlib import pyplot as plt
 
 import random
 import math
@@ -285,7 +286,7 @@ def get_action_v3(id_action, point, obs, num_dict=None):
                     func = actions.FunctionCall(_BUILD_SUPPLY_DEPOT, [_NOT_QUEUED, target])
                     return func, smart_action, num_dict
                 except UnboundLocalError:
-                    print(str(smart_action) + " " + str(point) + " is not an available action")
+                    # print(str(smart_action) + " " + str(point) + " is not an available action")
                     return get_action_v3(action_from_id[0], point, obs, num_dict)  # 'selectscv'
 
     elif smart_action == ACTION_BUILD_ENGBAY:
@@ -304,7 +305,7 @@ def get_action_v3(id_action, point, obs, num_dict=None):
             return func, smart_action, num_dict
         except UnboundLocalError:
             # num_dict["engbays"] -= 1
-            print(str(smart_action) + " " + str(point) + " is not an available action")
+            # print(str(smart_action) + " " + str(point) + " is not an available action")
             return get_action_v3(action_from_id[0], point, obs, num_dict)  # 'selectscv'
 
     elif smart_action == ACTION_BUILD_MISSLE_TURRENT:
@@ -331,7 +332,7 @@ def get_action_v3(id_action, point, obs, num_dict=None):
             return func, smart_action, num_dict
         except UnboundLocalError:
             num_dict['missile_turrets'] -= 1
-            print(str(smart_action) + " " + str(point) + " is not an available action")
+            # print(str(smart_action) + " " + str(point) + " is not an available action")
             if engbays_exist:
                 return get_action_v3(action_from_id[0], point, obs, num_dict)  # 'selectscv'
             else:
@@ -361,7 +362,7 @@ def get_action_v3(id_action, point, obs, num_dict=None):
                     return func, smart_action, num_dict
                 except UnboundLocalError:
                     num_dict["barracks"] -= 1
-                    print(str(smart_action) + " " + str(point) + " is not an available action")
+                    # print(str(smart_action) + " " + str(point) + " is not an available action")
                     if num_dict['supply_deports'] == 0:
                         return get_action_v3(action_from_id[1], point, obs, num_dict)  # 'buildsupplydepot'
                     else:
@@ -381,7 +382,7 @@ def get_action_v3(id_action, point, obs, num_dict=None):
             try:
                 return func, smart_action, num_dict
             except UnboundLocalError:
-                print(str(smart_action) + " " + str(point) + " is not an available action")
+                # print(str(smart_action) + " " + str(point) + " is not an available action")
                 return get_action_v3(action_from_id[2], point, obs, num_dict)  # 'buildbarracks'
 
     elif smart_action == ACTION_TRAIN_MARINE:
@@ -395,7 +396,7 @@ def get_action_v3(id_action, point, obs, num_dict=None):
             return func, smart_action, num_dict
         except UnboundLocalError:
             # num_dict["marines"] -= 1
-            print(str(smart_action) + " " + str(point) + " is not an available action")
+            # print(str(smart_action) + " " + str(point) + " is not an available action")
             return get_action_v3(action_from_id[3], point, obs, num_dict)  # 'selectbarracks'
 
     elif smart_action == ACTION_SELECT_ARMY:
@@ -404,7 +405,7 @@ def get_action_v3(id_action, point, obs, num_dict=None):
         try:
             return func, smart_action, num_dict
         except UnboundLocalError:
-            print(str(smart_action) + " " + str(point) + " is not an available action")
+            # print(str(smart_action) + " " + str(point) + " is not an available action")
             return get_action_v3(action_from_id[4], point, obs, num_dict)  # 'buildmarine'
 
     elif smart_action == ACTION_ATTACK:
@@ -455,7 +456,7 @@ def get_action_v3(id_action, point, obs, num_dict=None):
             return func, smart_action, num_dict
         except UnboundLocalError:
             num_dict['attack_cnt'] -= 1
-            print(str(smart_action) + " " + str(point) + " is not an available action")
+            # print(str(smart_action) + " " + str(point) + " is not an available action")
             if army_cnt < 8:
                 return get_action_v3(action_from_id[4], point, obs, num_dict)  # 'buildmarine'
             else:
@@ -468,13 +469,14 @@ def get_action_v3(id_action, point, obs, num_dict=None):
         return func, smart_action, num_dict
 
     except UnboundLocalError:
-        print(str(smart_action) + " " + str(point) + " is not an available action")
+        # print(str(smart_action) + " " + str(point) + " is not an available action")
         return actions.FunctionCall(_NO_OP, []), ACTION_DO_NOTHING, num_dict
 
 
 def main(unused_argv):
+    # TODO: save replay not working ...
     viz = True
-    replay_prefix = 'D:/software/python_prj/SCII/SCII_Bots/replays/deterministic_sequence'
+    replay_prefix = 'D:/software/python_prj/SCII/SCII_Bots/replays/dqn'
     replay_dir = '/replays'
     real_time = False
     ensure_available_actions = True
@@ -482,7 +484,7 @@ def main(unused_argv):
     train_mode = False           # True  False
     game_steps_per_episode = 5000  # 0 actually means unlimited
     if train_mode == True:
-        MAX_EPISODES = 100
+        MAX_EPISODES = 1000
     else:
         MAX_EPISODES = 1
     MAX_STEPS = 3000  # 运行500个step耗时约为2：57
@@ -505,9 +507,9 @@ def main(unused_argv):
                 realtime=real_time,
                 ensure_available_actions=ensure_available_actions,
                 disable_fog=disable_fog,
-                # save_replay_episodes=1,
-                # replay_prefix=replay_prefix,
-                # replay_dir=replay_dir,
+                save_replay_episodes=56,
+                replay_prefix=replay_prefix,
+                replay_dir=replay_dir,
                 # game_steps_per_episode=game_steps_per_episode
         ) as env:
 
@@ -523,15 +525,16 @@ def main(unused_argv):
             path_lst = os.listdir('./save/dqn')
             if len(path_lst) != 0:
                 max_episode_in_last_play = max([int(p.split('.')[0].split('i')[-1]) for p in path_lst])
-                load_path = Path(Path(os.getcwd()) / 'save' / 'a2c' / 'Simple64-a2c_actor-epi{}.pt'.format(max_episode_in_last_play))
+                load_path = Path(Path(os.getcwd()) / 'save' / 'dqn' / 'Simple64-dqn-epi{}.pt'.format(max_episode_in_last_play))
             else:
                 load_path = 'none'
             algo = q_learning.DeepQLearning(load_path)
 
-            logs_path_lst = os.listdir('./logs')
+            logs_path_lst = os.listdir('./logs/history_data')
             if len(logs_path_lst) != 0:
-                max_batch_pool_in_last_play = max([int(os.listdir('./logs')[p].split('p')[-2].split('.')[0]) for p in range(len(logs_path_lst))])
+                max_batch_pool_in_last_play = max([int(os.listdir('./logs/history_data')[p].split('p')[-2].split('.')[0]) for p in range(len(logs_path_lst))])
             batch_pool_idx = max_batch_pool_in_last_play + 1
+            losses_lst = []
             for e in range(max_episode_in_last_play+1, max_episode_in_last_play+MAX_EPISODES+1):
                 if e > 0:
                     obs = env.reset()
@@ -559,13 +562,13 @@ def main(unused_argv):
 
                     preds = algo.choose_action_v(state_model, init)
 
-                    print()
+                    # print()
                     action, point = action_from_id[np.argmax(preds[0].detach().cpu().numpy())], \
                                     [i for i in range(4096)][np.argmax(preds[1].detach().cpu().numpy())]
                     func, actual_action, new_num_dict = get_action_v3(action, point, obs=obs[0], num_dict=num_dict)
 
                     next_obs = env.step([func])
-                    print(actual_action, point)
+                    # print(actual_action, point)
 
                     next_state = get_state(next_obs[0])
                     num_dict = new_num_dict
@@ -582,7 +585,7 @@ def main(unused_argv):
                         next_obs[0].observation.score_cumulative[5] + next_obs[0].observation.score_cumulative[6])  # next_obs[0].observation.score_cumulative[5], [6]: 'killed_value_units' (2745642291968)，'killed_value_structures' (2745642292040)
 
                     if actual_action == action:
-                        reward_a = reward_a + 5
+                        reward_a = reward_a * 10
                     reward = [reward_a, reward_p]
 
                     last_action = obs[0].observation.last_actions
@@ -592,8 +595,10 @@ def main(unused_argv):
 
                         if env._obs[0].player_result[0].result == 1:  # player0(unknown)胜利
                             reward = list(np.array(reward) + 10000)
+                            dataset[8] = np.array([np.array(dataset[i][8]) for i in range(len(dataset))]) * 100
                         elif env._obs[0].player_result[0].result == 2:  # player0(unknown)战败
                             reward = list(np.array(reward) - 10000)
+                            dataset[8] = np.array([np.array(dataset[i][8]) for i in range(len(dataset))]) / 100
                             # dataset = []
 
                     if time == MAX_STEPS - 1:
@@ -622,6 +627,8 @@ def main(unused_argv):
 
                         previous_state = state
                         previous_action = action
+                        if train_mode:
+                            algo.copy()
                         break
 
                     # # save agent info
@@ -634,14 +641,15 @@ def main(unused_argv):
                         [e, time, state_model, state_model_next, action, actual_action, last_action, point, reward,
                          score, done]
                     )
-                    if len(dataset) >= 1280:  # TODO: HOW TO LEARN ??
+                    if len(dataset) >= 256:  # TODO: HOW TO LEARN ??
                         if train_mode:
-                            algo.learn(dataset, id_from_actions)
-
-                        # np.savez_compressed('./logs/history_dqn_sequence_bp{}.npz'.format(str(batch_pool_idx)), np.array(dataset))
-                        # 保存为pickle文件
-                        with open('./logs/history_dqn_sequence_bp{}.pkl'.format(str(batch_pool_idx)), "wb") as f:
-                            pickle.dump(np.array(dataset), f)
+                            loss_per_batch = algo.learn(dataset, id_from_actions)
+                            losses_lst.append(np.mean(loss_per_batch))
+                        if e % 10 == 0:
+                            # np.savez_compressed('./logs/history_dqn_sequence_bp{}.npz'.format(str(batch_pool_idx)), np.array(dataset))
+                            # 保存为pickle文件
+                            with open('./logs/history_data/history_dqn_sequence_bp{}_score{}.pkl'.format(str(batch_pool_idx), str(score)), "wb") as f:
+                                pickle.dump(np.array(dataset), f)
                         dataset = []
                         batch_pool_idx += 1
 
@@ -652,8 +660,13 @@ def main(unused_argv):
                     # time += 1
 
                 if train_mode:
-                    save_path = './save/dqn/Simple64-dqn-epi{}.pt'.format(e)
+                    save_path = './save/dqn/Simple64-dqn-epi{}-score{}.pt'.format(e, score)
                     algo.save(save_path)
+
+            if train_mode:
+                plt.plot(losses_lst)
+                plt.savefig('./logs/train_process/train_process_dqn_{}_to_{}'.format(max_episode_in_last_play+1, max_episode_in_last_play+MAX_EPISODES+1))
+                plt.show()
     except KeyboardInterrupt:
         pass
     # finally:
@@ -664,3 +677,10 @@ def main(unused_argv):
 
 if __name__ == '__main__':
     app.run(main)
+    pass
+    """
+    I0606 19:39:39.231369 78480 sc2_env.py:725] Episode 54 finished after 12248 game steps. Outcome: [1], reward: [1], score: [6465]
+    episode: 54/1000, score: 192297.5
+    
+    episode: 58/1000, score: 527777.5
+    """
