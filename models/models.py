@@ -415,3 +415,74 @@ class SimpleConvNet_val(nn.Module):
         # v = torch.softmax(xo, 1)
         return [v1, v2]
 
+
+class NeuralAgent_val_rec(nn.Module):
+    def __init__(self, input_size, output_size):
+        super(NeuralAgent_val_rec, self).__init__()
+        # 定义网络结构
+        """
+        nn.Conv2d(in_channels, 8, 5)：
+            W：in_channels: 输入大小  64*64
+            F：卷积核大小 5*5
+            P：填充值的大小    0默认值
+            S：步长大小  1默认值
+            N：输出大小
+                N=(W-F+2P)/S+1=(64-5 + 2*0)/1 + 1 = 60
+            out_channels: 输出通道数 8
+            输出为：8(out_channels)*60*60           # 有小数时向下取整
+        """
+        self.conv1 = nn.Conv2d(in_channels=input_size[0] + input_size[1], out_channels=8, kernel_size=5)
+
+        """
+        nn.MaxPool2d(2, 2):
+            W：输入大小  60*60
+            F：kernel_size: 卷积核大小 2*2
+            P：填充值的大小    0默认值
+            S：stride: 步长大小  2
+            N：输出大小          # 有小数时向上取整
+                N=(W-F+2P)/S+1=(60-2 + 2*0)/2 + 1 = 30
+            out_channels: 输出通道数 8
+            输出为：8*30*30
+        """
+        self.pool1 = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.conv2 = nn.Conv2d(8, 16, 5)
+        self.pool2 = nn.MaxPool2d(kernel_size=2, stride=2)
+
+        # self.fc1 = nn.Linear(16*12*12, 32)
+        self.fc1 = nn.Linear(16 * 13 * 13, 32)
+        self.fc2 = nn.Linear(43, 16)
+
+        # self.lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True)
+
+        self.fc_o1 = nn.Linear(16, output_size[0])  # len(categorical_actions)
+        self.fc_o2 = nn.Linear(16, output_size[1])  # len(categorical_actions)
+
+    def forward(self, input_x):
+        input0 = torch.unsqueeze(Variable(torch.tensor(input_x[0])), 0) if len(input_x[0].shape) == 3 else Variable(
+            torch.tensor(input_x[0]))  # input.shape = (1, 27, 64, 64)
+        input0 = input0.cuda() if torch.cuda.is_available() else input0
+        input1 = torch.unsqueeze(Variable(torch.tensor(input_x[1])), 0) if len(input_x[1].shape) == 3 else Variable(
+            torch.tensor(input_x[1]))  # input.shape = (1, 11, 64, 64)
+        input1 = input1.cuda() if torch.cuda.is_available() else input1
+        # input2 = input2.cuda() if torch.cuda.is_available() else input2          # input.shape = (11, )
+
+        input_concat = torch.cat([input0, input1], dim=1)
+        x = self.pool1(F.relu(self.conv1(input_concat.float())))
+        # x = torch.flatten(x)
+        x = self.pool2(F.relu(self.conv2(x)))
+        # x = self.fc1(x.flatten())
+        x = self.fc1(x.view(x.size(0), -1))  # x.view(x.size(0), -1): 自动识别batch维度
+
+        input2 = torch.unsqueeze(Variable(torch.tensor(input_x[2])), 0) if len(input_x[2].shape) == 1 else Variable(torch.tensor(input_x[2]))  # input.shape = (1, 11, 64, 64)
+        input2 = input2.cuda() if torch.cuda.is_available() else input2  # input.shape = (11, )
+
+        x = self.fc2(torch.cat([x, input2.float()], 1))
+
+        xo1 = self.fc_o1(x)
+        xo2 = self.fc_o2(x)
+
+        v1 = torch.relu(xo1)
+        v2 = torch.relu(xo2)
+
+        # v = torch.softmax(xo, 1)
+        return [v1, v2]

@@ -76,6 +76,27 @@ $$
 
 In addition, the reward will adjusted further to simulate the returns from environment more precisely. 
 
+- if action is available, actual_action is action, else raise UnboundLocError and actual_action is NoOP. 
+
+```python
+if actual_action == action:
+    reward_a = reward_a * 10
+```
+
+- if win in an episode:
+
+```python
+reward = list(np.array(reward) + 10000)
+```
+
+- if done is True (forces are equal in the match of each side):
+
+```
+reward = list(np.array(reward) - 5000)
+```
+
+
+
 ------
 
 Run the environment test script as follows with
@@ -120,7 +141,7 @@ Also, two different functional models, named as operation model and warfare mode
 
 
 
-The structure of **A2C** neural agent is constructed as follows with pytorch 1.2.0. (coming soon)
+The structure of **A2C** neural agent is constructed as follows with pytorch 1.2.0. (**Coming soon**)
 
 <img src="assets/a2cagent-1621745942426.png" style="zoom:10%"/>
 
@@ -128,33 +149,17 @@ The structure of **A2C** neural agent is constructed as follows with pytorch 1.2
 
 ### evaluating
 
-It costs much time but the a2c-agent does learn something like:
+It costs much time but the agent does learn something like:
 
-- Less Idle workers are better (maximum 6 at first, no more than 3 after take screenshot)
-
-![img](file:///C:/Users/zz-guo/AppData/Local/Temp/msohtmlclip1/01/clip_image002.jpg)Episode 190
-
-![img](file:///C:/Users/zz-guo/AppData/Local/Temp/msohtmlclip1/01/clip_image004.jpg)Episode 191
+-  The most important, the agent has learned about how to  select army and attack (select_scv-->build_supply_deport-->build_barrack-->train marines in multiple times-->select_all_troops-->attack_point). 
+-  learned to train new battle units when army is losing. 
+- learning to attack specific position
 
 
 
--  Too many engine bays are not useful (maximum 7 at first, only build one mostly at now)
+ Average learning losses after 1068 batch_pools. 
 
-![img](file:///C:/Users/zz-guo/AppData/Local/Temp/msohtmlclip1/01/clip_image008.jpg) episode 178
-
-![img](file:///C:/Users/zz-guo/AppData/Local/Temp/msohtmlclip1/01/clip_image010.jpg)episode 204
-
- 
-
-- Action sequence about how to train marines and attack (before marines can be trained, minerals must enough, supply deport and barrack must be built)
-
-![img](file:///C:/Users/zz-guo/AppData/Local/Temp/msohtmlclip1/01/clip_image012.jpg)episode 185
-
-![img](file:///C:/Users/zz-guo/AppData/Local/Temp/msohtmlclip1/01/clip_image014.jpg)episode 187
-
-There is no final results yet but COMING SOON ...
-
-
+![image-20210608150500854](assets\image-20210608150500854.png)
 
 And finally,
 

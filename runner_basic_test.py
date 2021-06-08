@@ -557,6 +557,7 @@ def main(unused_argv):
                             score_pre = score
 
                         done = False
+                        break
 
                     if time % 10 == 0:
                         if score_pre < score:
@@ -569,7 +570,7 @@ def main(unused_argv):
 
                     time += 1
                 history_arr = np.array(history)
-                np.savez_compressed('./logs/history_deterministic_sequence_{}.npz'.format(str(e)), history_arr)
+                # np.savez_compressed('./logs/history_deterministic_sequence_{}.npz'.format(str(e)), history_arr)
     except KeyboardInterrupt:
         pass
     # finally:

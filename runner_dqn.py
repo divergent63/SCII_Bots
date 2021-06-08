@@ -475,20 +475,21 @@ def get_action_v3(id_action, point, obs, num_dict=None):
 
 def main(unused_argv):
     # TODO: save replay not working ...
+
     viz = True
-    replay_prefix = 'D:/software/python_prj/SCII/SCII_Bots/replays/dqn'
+    replay_prefix = 'D:/software/python_prj/SCII/SCII_Bots/replays/deterministic_sequence'
     replay_dir = '/replays'
     real_time = False
     ensure_available_actions = True
     disable_fog = True
-    train_mode = False           # True  False
-    game_steps_per_episode = 5000  # 0 actually means unlimited
+    steps_per_episode = 0  # 0 actually means unlimited
+    MAX_EPISODES = 1
+    MAX_STEPS = 300000
+    train_mode = True           # True  False
     if train_mode == True:
         MAX_EPISODES = 1000
     else:
         MAX_EPISODES = 1
-    MAX_STEPS = 3000  # 运行500个step耗时约为2：57
-
     try:
         # run trajectories and train
         with sc2_env.SC2Env(
@@ -507,10 +508,9 @@ def main(unused_argv):
                 realtime=real_time,
                 ensure_available_actions=ensure_available_actions,
                 disable_fog=disable_fog,
-                save_replay_episodes=56,
-                replay_prefix=replay_prefix,
-                replay_dir=replay_dir,
-                # game_steps_per_episode=game_steps_per_episode
+                # save_replay_episodes=1,
+                # replay_prefix=replay_prefix,
+                # replay_dir=replay_dir,
         ) as env:
 
             done = False
@@ -524,7 +524,7 @@ def main(unused_argv):
 
             path_lst = os.listdir('./save/dqn')
             if len(path_lst) != 0:
-                max_episode_in_last_play = max([int(p.split('.')[0].split('i')[-1]) for p in path_lst])
+                max_episode_in_last_play = max([int(p.split('.')[0].split('i')[-1].split('-')[0]) for p in path_lst])
                 load_path = Path(Path(os.getcwd()) / 'save' / 'dqn' / 'Simple64-dqn-epi{}.pt'.format(max_episode_in_last_play))
             else:
                 load_path = 'none'
@@ -595,10 +595,12 @@ def main(unused_argv):
 
                         if env._obs[0].player_result[0].result == 1:  # player0(unknown)胜利
                             reward = list(np.array(reward) + 10000)
-                            dataset[8] = np.array([np.array(dataset[i][8]) for i in range(len(dataset))]) * 100
+                            for k in range(len(dataset)):
+                                dataset[k][8] = list(np.array([np.array(dataset[i][8]) for i in range(len(dataset))]) * 100)[k]
                         elif env._obs[0].player_result[0].result == 2:  # player0(unknown)战败
                             reward = list(np.array(reward) - 10000)
-                            dataset[8] = np.array([np.array(dataset[i][8]) for i in range(len(dataset))]) / 100
+                            for k in range(len(dataset)):
+                                dataset[k][8] = list(np.array([np.array(dataset[i][8]) for i in range(len(dataset))]) / 100)[k]
                             # dataset = []
 
                     if time == MAX_STEPS - 1:
@@ -645,6 +647,7 @@ def main(unused_argv):
                         if train_mode:
                             loss_per_batch = algo.learn(dataset, id_from_actions)
                             losses_lst.append(np.mean(loss_per_batch))
+                            print('episode:   ', e, 'critic_network_loss', loss_per_batch)
                         if e % 10 == 0:
                             # np.savez_compressed('./logs/history_dqn_sequence_bp{}.npz'.format(str(batch_pool_idx)), np.array(dataset))
                             # 保存为pickle文件

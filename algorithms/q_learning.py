@@ -161,7 +161,7 @@ class DeepQLearning:
 
             # values = model_critic([states_var_screen, states_var_minimap, states_var_player])
             critic_network_loss = self.criterion(q_predict[0], target_values) + self.criterion(q_predict[1], target_values_p)            # + criterion(q_predict[1], target_values)
-            print('critic_network_loss:  \n', critic_network_loss, '\n')
+            print('epoch:  ', epoch, '  critic_network_loss:  \n', critic_network_loss, '\n')
             critic_network_loss_lst.append(float(critic_network_loss.detach().cpu().numpy()))
             
             self.critic_optim.zero_grad()
