@@ -6,13 +6,6 @@ from pysc2.lib import actions, features, units
 from pysc2.env import sc2_env, run_loop, available_actions_printer
 from pysc2 import maps
 
-import sc2
-from sc2 import run_game, maps, Race, Difficulty, position
-from sc2.player import Bot, Computer, Human
-from sc2.constants import NEXUS, PROBE, PYLON, ASSIMILATOR, GATEWAY, \
-    CYBERNETICSCORE, STALKER, STARGATE, VOIDRAY, OBSERVER, ROBOTICSFACILITY
-# from terran_agent import TerranAgent
-
 import models.models as models
 import algorithms.q_learning as q_learning
 
@@ -134,23 +127,13 @@ spatial_actions = [_MOVE_SCREEN]
 
 id_from_actions = {}
 action_from_id = {}
-# for ix, k in enumerate(spatial_actions):
-#     id_from_actions[k] = ix
-#     action_from_id[ix] = k
-# for ix, k in enumerate(categorical_actions):
-#     id_from_actions[k] = ix+len(spatial_actions)
-#     action_from_id[ix+len(spatial_actions)] = k
+
 for ix, k in enumerate(categorical_actions):
     id_from_actions[k] = ix
     action_from_id[ix] = k
 
 FLAGS = flags.FLAGS
 FLAGS(['run_sc2'])
-
-
-# def get_action_v3(state):
-#
-#     pass
 
 
 def get_state(obs):
@@ -208,9 +191,6 @@ def get_action_v3(id_action, point, obs, num_dict=None):
     current_state[3] = army_supply
 
     hot_squares = np.zeros(16)
-
-    army_selected = False
-    army_rallied = False
 
     if (obs.observation['feature_minimap'][_PLAYER_RELATIVE] == _PLAYER_HOSTILE).nonzero():
         enemy_y, enemy_x = (obs.observation['feature_minimap'][_PLAYER_RELATIVE] == _PLAYER_HOSTILE).nonzero()
@@ -412,12 +392,8 @@ def get_action_v3(id_action, point, obs, num_dict=None):
         enemy_y, enemy_x = (obs.observation['feature_minimap'][_PLAYER_RELATIVE] == _PLAYER_HOSTILE).nonzero()
 
         if (obs.observation['feature_minimap'][_PLAYER_RELATIVE] == _PLAYER_HOSTILE).nonzero():  # 攻击已知敌人
-            # for i in range(0, len(enemy_y)):
-            # marines_cnt = num_dict["marines"]
 
-            # if len(obs.observation['multi_select']) and army_cnt > 12 and num_dict['attack_cnt'] < 2:
             if len(obs.observation['multi_select']) and army_cnt > 8:
-                # if obs.observation['multi_select'][0][0] != _TERRAN_SCV and _ATTACK_MINIMAP in obs.observation["available_actions"]:
                 if _ATTACK_MINIMAP in obs.observation["available_actions"]:
                     # if _ATTACK_MINIMAP in obs.observation["available_actions"]:
                     if enemy_y.any():
@@ -425,29 +401,8 @@ def get_action_v3(id_action, point, obs, num_dict=None):
                         target = to_yx(point)           # TODO:
                         func = actions.FunctionCall(_ATTACK_MINIMAP, [_NOT_QUEUED, target])
                         # num_dict['marines'] = 0
-            # elif num_dict['attack_cnt'] >= 2 and len(obs.observation['multi_select']) and army_cnt >= 3:
-            #     # if obs.observation['multi_select'][0][0] != _TERRAN_SCV and _ATTACK_MINIMAP in obs.observation["available_actions"]:
-            #     if _ATTACK_MINIMAP in obs.observation["available_actions"]:
-            #         # if _ATTACK_MINIMAP in obs.observation["available_actions"]:
-            #         if enemy_y.any():
-            #             target = [int(np.random.choice(enemy_x)), int(np.random.choice(enemy_y))]
-            #             # target = to_yx(point)           # TODO:
-            #             func = actions.FunctionCall(_ATTACK_MINIMAP, [_NOT_QUEUED, target])
-            #             # num_dict['marines'] = 0
-            # else:
-            #     if len(obs.observation['multi_select']):
-            #         # if obs.observation['multi_select'][0][0] != _TERRAN_SCV and _ATTACK_MINIMAP in obs.observation["available_actions"]:
-            #         if _ATTACK_MINIMAP in obs.observation["available_actions"]:
-            #             # if _ATTACK_MINIMAP in obs.observation["available_actions"]:
-            #             if enemy_y.any():
-            #                 target = [int(np.random.choice(enemy_x)), int(np.random.choice(enemy_y))]
-            #                 # target = to_yx(point)           # TODO:
-            #                 func = actions.FunctionCall(_ATTACK_MINIMAP, [_NOT_QUEUED, target])
-            #                 # num_dict['marines'] = 0
-            #                 num_dict['attack_cnt'] += 1
         else:  # 攻击任意位置（未找到敌人时，类似巡逻）
             if len(obs.observation['multi_select']):
-                # if obs.observation['multi_select'][0][0] != _TERRAN_SCV and _ATTACK_MINIMAP in obs.observation["available_actions"]:
                 if _ATTACK_MINIMAP in obs.observation["available_actions"]:
                     target = to_yx(point)
                     func = actions.FunctionCall(_ATTACK_MINIMAP, [_NOT_QUEUED, target])
@@ -514,11 +469,8 @@ def main(unused_argv):
         ) as env:
 
             done = False
-            # history = []
             dataset = []
 
-            score = 0
-            score_pre = 0
             max_batch_pool_in_last_play = 0
             max_episode_in_last_play = 0
 
@@ -540,10 +492,6 @@ def main(unused_argv):
                     obs = env.reset()
 
                 score = 0
-                score_pre = 0
-
-                control_seq = []
-                control_idx = 1
 
                 num_dict = {"workers": 0, "idle_workers": 0, "barracks": 0, "engbays": 0,
                             # "marines": 0,
@@ -557,29 +505,20 @@ def main(unused_argv):
                                    np.array(obs[0].observation.feature_minimap), np.array(obs[0].observation.player)]
                     # TODO: state_model = [np.array(obs[0].observation.feature_screen), np.array(obs[0].observation.feature_minimap), np.array(obs[0].observation.player), np.array(obs[0].observation.last_actions)]
 
-                    # action, point = action_from_id[np.random.choice(len(action_from_id), 1)[0]], np.random.randint(4096)
-                    # func, actual_action, new_num_dict = get_action_v3(action, point, obs=obs[0], num_dict=num_dict)
-
                     preds = algo.choose_action_v(state_model, init)
 
-                    # print()
                     action, point = action_from_id[np.argmax(preds[0].detach().cpu().numpy())], \
                                     [i for i in range(4096)][np.argmax(preds[1].detach().cpu().numpy())]
                     func, actual_action, new_num_dict = get_action_v3(action, point, obs=obs[0], num_dict=num_dict)
 
                     next_obs = env.step([func])
-                    # print(actual_action, point)
 
                     next_state = get_state(next_obs[0])
                     num_dict = new_num_dict
                     state_model_next = [np.array(obs[0].observation.feature_screen),
                                         np.array(obs[0].observation.feature_minimap),
                                         np.array(obs[0].observation.player)]
-                    # reward_a = float(next_obs[0].reward) + float(next_obs[0].observation.score_cumulative[
-                    #                                                  0]) * 10e-8  # next_obs[0].observation.score_cumulative[0]: 'score' (2745598944344)
-                    # reward_a = float(next_obs[0].observation.score_cumulative[11]) * 10e-8          # spent_minerals
-                    # reward_p = float(
-                    #     next_obs[0].observation.score_cumulative[5] + next_obs[0].observation.score_cumulative[6]) * 10e-8  # next_obs[0].observation.score_cumulative[5], [6]: 'killed_value_units' (2745642291968)，'killed_value_structures' (2745642292040)
+
                     reward_a = float(next_obs[0].observation.score_cumulative[11]) * 10e-2          # spent_minerals
                     reward_p = float(
                         next_obs[0].observation.score_cumulative[5] + next_obs[0].observation.score_cumulative[6])  # next_obs[0].observation.score_cumulative[5], [6]: 'killed_value_units' (2745642291968)，'killed_value_structures' (2745642292040)
@@ -601,7 +540,6 @@ def main(unused_argv):
                             reward = list(np.array(reward) - 10000)
                             for k in range(len(dataset)):
                                 dataset[k][8] = list(np.array([np.array(dataset[i][8]) for i in range(len(dataset))]) / 100)[k]
-                            # dataset = []
 
                     if time == MAX_STEPS - 1:
                         done = True
@@ -615,30 +553,13 @@ def main(unused_argv):
                         )
                         num_dict["barracks"] = 0
                         print("episode: {}/{}, score: {}".format(e, max_episode_in_last_play+MAX_EPISODES, score))
-                        if score_pre < score:
-                            score_pre = score
-                        # history_arr = np.array(history)
-                        # np.savez_compressed('./logs/history_dqn_sequence_{}.npz'.format(str(e)), history_arr)
-                        # history = []
 
                         done = False
 
-                        # logging.info("state: %s", str(state))
-                        # logging.info("action: %s", str(action))
-                        # logging.info("reward: %s", str(obs.reward))
-
-                        previous_state = state
-                        previous_action = action
                         if train_mode:
                             algo.copy()
                         break
 
-                    # # save agent info
-                    # history.append(
-                    #     [e, time, state_model, state_model_next, action, actual_action, last_action, point, reward, score, done]
-                    # )
-                    # if len(history) == 128:
-                    #     minibatch = random.sample(history, 32)
                     dataset.append(
                         [e, time, state_model, state_model_next, action, actual_action, last_action, point, reward,
                          score, done]
@@ -649,18 +570,14 @@ def main(unused_argv):
                             losses_lst.append(np.mean(loss_per_batch))
                             print('episode:   ', e, 'critic_network_loss', loss_per_batch)
                         if e % 10 == 0:
-                            # np.savez_compressed('./logs/history_dqn_sequence_bp{}.npz'.format(str(batch_pool_idx)), np.array(dataset))
                             # 保存为pickle文件
                             with open('./logs/history_data/history_dqn_sequence_bp{}_score{}.pkl'.format(str(batch_pool_idx), str(score)), "wb") as f:
                                 pickle.dump(np.array(dataset), f)
                         dataset = []
                         batch_pool_idx += 1
 
-                    # algo.check_state_exist(state_model)
                     state = next_state
                     obs = next_obs
-
-                    # time += 1
 
                 if train_mode:
                     save_path = './save/dqn/Simple64-dqn-epi{}-score{}.pt'.format(e, score)
@@ -672,18 +589,8 @@ def main(unused_argv):
                 plt.show()
     except KeyboardInterrupt:
         pass
-    # finally:
-    #     elapsed_time = time.time() - start_time
-    #     print("Took %.3f seconds for %s steps: %.3f fps" % (
-    #         elapsed_time, total_frames, total_frames / elapsed_time))
 
 
 if __name__ == '__main__':
     app.run(main)
     pass
-    """
-    I0606 19:39:39.231369 78480 sc2_env.py:725] Episode 54 finished after 12248 game steps. Outcome: [1], reward: [1], score: [6465]
-    episode: 54/1000, score: 192297.5
-    
-    episode: 58/1000, score: 527777.5
-    """
