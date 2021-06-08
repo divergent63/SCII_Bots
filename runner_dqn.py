@@ -16,6 +16,7 @@ from matplotlib import pyplot as plt
 import random
 import math
 import pickle
+import pandas as pd
 import os, sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
@@ -463,9 +464,9 @@ def main(unused_argv):
                 realtime=real_time,
                 ensure_available_actions=ensure_available_actions,
                 disable_fog=disable_fog,
-                # save_replay_episodes=1,
-                # replay_prefix=replay_prefix,
-                # replay_dir=replay_dir,
+                save_replay_episodes=1,
+                replay_prefix=replay_prefix,
+                replay_dir=replay_dir,
         ) as env:
 
             done = False
@@ -484,7 +485,7 @@ def main(unused_argv):
 
             logs_path_lst = os.listdir('./logs/history_data')
             if len(logs_path_lst) != 0:
-                max_batch_pool_in_last_play = max([int(os.listdir('./logs/history_data')[p].split('p')[-2].split('.')[0]) for p in range(len(logs_path_lst))])
+                max_batch_pool_in_last_play = max([int(os.listdir('./logs/history_data')[p].split('p')[-2].split('.')[0].split('_')[0]) for p in range(len(logs_path_lst))])
             batch_pool_idx = max_batch_pool_in_last_play + 1
             losses_lst = []
             for e in range(max_episode_in_last_play+1, max_episode_in_last_play+MAX_EPISODES+1):
@@ -519,9 +520,9 @@ def main(unused_argv):
                                         np.array(obs[0].observation.feature_minimap),
                                         np.array(obs[0].observation.player)]
 
-                    reward_a = float(next_obs[0].observation.score_cumulative[11]) * 10e-2          # spent_minerals
-                    reward_p = float(
-                        next_obs[0].observation.score_cumulative[5] + next_obs[0].observation.score_cumulative[6])  # next_obs[0].observation.score_cumulative[5], [6]: 'killed_value_units' (2745642291968)，'killed_value_structures' (2745642292040)
+                    # reward_a = float(next_obs[0].observation.score_cumulative[11]) * 10e-2          # spent_minerals
+                    reward_a = float(next_obs[0].observation.score_cumulative[3])        # total_value_units
+                    reward_p = float(next_obs[0].observation.score_cumulative[5] + next_obs[0].observation.score_cumulative[6])  # next_obs[0].observation.score_cumulative[5], [6]: 'killed_value_units' (2745642291968)，'killed_value_structures' (2745642292040)
 
                     if actual_action == action:
                         reward_a = reward_a * 10
@@ -531,15 +532,16 @@ def main(unused_argv):
 
                     if env._controllers and env._controllers[0].status.value != 3:
                         done = True
+                        print("episode: {}/{}, score: {}".format(e, max_episode_in_last_play+MAX_EPISODES, score))
 
                         if env._obs[0].player_result[0].result == 1:  # player0(unknown)胜利
                             reward = list(np.array(reward) + 10000)
-                            for k in range(len(dataset)):
-                                dataset[k][8] = list(np.array([np.array(dataset[i][8]) for i in range(len(dataset))]) * 100)[k]
+                            # for k in range(len(dataset)):
+                            #     dataset[k][8] = list(np.array([np.array(dataset[i][8]) for i in range(len(dataset))]) * 100)[k]
                         elif env._obs[0].player_result[0].result == 2:  # player0(unknown)战败
                             reward = list(np.array(reward) - 10000)
-                            for k in range(len(dataset)):
-                                dataset[k][8] = list(np.array([np.array(dataset[i][8]) for i in range(len(dataset))]) / 100)[k]
+                            # for k in range(len(dataset)):
+                            #     dataset[k][8] = list(np.array([np.array(dataset[i][8]) for i in range(len(dataset))]) / 100)[k]
 
                     if time == MAX_STEPS - 1:
                         done = True
@@ -552,7 +554,6 @@ def main(unused_argv):
                              score, done]
                         )
                         num_dict["barracks"] = 0
-                        print("episode: {}/{}, score: {}".format(e, max_episode_in_last_play+MAX_EPISODES, score))
 
                         done = False
 
@@ -568,7 +569,7 @@ def main(unused_argv):
                         if train_mode:
                             loss_per_batch = algo.learn(dataset, id_from_actions)
                             losses_lst.append(np.mean(loss_per_batch))
-                            print('episode:   ', e, 'critic_network_loss', loss_per_batch)
+                            print('episode:   ', e, '    critic_network_loss', loss_per_batch)
                         if e % 10 == 0:
                             # 保存为pickle文件
                             with open('./logs/history_data/history_dqn_sequence_bp{}_score{}.pkl'.format(str(batch_pool_idx), str(score)), "wb") as f:
@@ -587,6 +588,8 @@ def main(unused_argv):
                 plt.plot(losses_lst)
                 plt.savefig('./logs/train_process/train_process_dqn_{}_to_{}'.format(max_episode_in_last_play+1, max_episode_in_last_play+MAX_EPISODES+1))
                 plt.show()
+
+                pd.DataFrame(losses_lst).to_csv('./logs/train_process/losses_lst.csv')
     except KeyboardInterrupt:
         pass
 

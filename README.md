@@ -76,7 +76,7 @@ $$
 
 In addition, the reward will adjusted further to simulate the returns from environment more precisely. 
 
-- if action is available, actual_action is action, else raise UnboundLocError and actual_action is NoOP. 
+- if action is available, actual_action is action, else expect UnboundLocalError and return actual_action as *actions.FUNCTIONS.no_op*. 
 
 ```python
 if actual_action == action:
@@ -120,6 +120,8 @@ python runner_nn_test.py
 ```
 
 
+
+------
 
 Train an A2C agent to play the game with （Coming Soon）
 
@@ -167,10 +169,14 @@ And finally,
 
 
 
-TODO List:
+**TODO List:**
 
 1. Standardize the game rules in environment;
-2. Redesign the reward function.
+2. Use Keyframe rather than all frame as inputs;
+3. Use recurrent block to extract temporal features;
+4. Optimize the attack position to select from the positions of known enemies, rather than all positions on the mini-map;
+5. add residual block to reinforce the ability of image feature extraction;
+6. add attention module to refine the functions in each module.
 
 ### references
 
