@@ -177,6 +177,7 @@ And finally,
 4. Optimize the attack position to select from the positions of known enemies, rather than all positions on the mini-map;
 5. add residual block to reinforce the ability of image feature extraction;
 6. add attention module to refine the functions in each module.
+7. test git merge
 
 ### references
 
