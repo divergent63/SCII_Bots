@@ -1,22 +1,34 @@
-# -*- coding: UTF-8 -*-#
-# This runner is based on actions.FUNCTIONS (.\anaconda\a3_64\envs\py37_clone_v8\Lib\site-packages\pysc2\lib\actions.py)
-
+#!/usr/bin/env python
+# coding=utf-8
+'''
+Author: ZZ_Guo
+Email: 634184805@qq.com
+Date: 2020-09-11 23:03:00
+LastEditor: ZZ_Guo
+LastEditTime: 2021-05-06 17:04:38
+Discription:
+Environment:
+'''
 from pysc2.lib import actions, features, units
 
 from pysc2.env import sc2_env, run_loop, available_actions_printer
 from pysc2 import maps
+
+import sc2
+from sc2 import run_game, maps, Race, Difficulty, position
+from sc2.player import Bot, Computer, Human
+from sc2.constants import NEXUS, PROBE, PYLON, ASSIMILATOR, GATEWAY, \
+    CYBERNETICSCORE, STALKER, STARGATE, VOIDRAY, OBSERVER, ROBOTICSFACILITY
+# from terran_agent import TerranAgent
 
 import models.models as models
 import algorithms.q_learning as q_learning
 
 from pathlib import Path
 from absl import app, logging, flags
-from matplotlib import pyplot as plt
 
 import random
 import math
-import pickle
-import pandas as pd
 import os, sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
@@ -128,16 +140,27 @@ spatial_actions = [_MOVE_SCREEN]
 
 id_from_actions = {}
 action_from_id = {}
-
+# for ix, k in enumerate(spatial_actions):
+#     id_from_actions[k] = ix
+#     action_from_id[ix] = k
+# for ix, k in enumerate(categorical_actions):
+#     id_from_actions[k] = ix+len(spatial_actions)
+#     action_from_id[ix+len(spatial_actions)] = k
 for ix, k in enumerate(categorical_actions):
     id_from_actions[k] = ix
     action_from_id[ix] = k
 
+
 FLAGS = flags.FLAGS
 FLAGS(['run_sc2'])
 
+# def get_action_v3(state):
+#
+#     pass
+
 
 def get_state(obs):
+
     return [np.array(obs.observation['feature_screen']).reshape(1, 27, 64, 64),
             np.array(obs.observation['feature_minimap']).reshape(1, 11, 64, 64),
             np.array(obs.observation['player']).reshape(1, 11)
@@ -146,7 +169,7 @@ def get_state(obs):
 
 def to_yx(point):
     """transform a scalar from [0;4095] to a (y,x) coordinate in [0:63,0:63]"""
-    return int(point % 64), int((point - (point % 64)) / 64)
+    return point % 64, (point - (point % 64)) / 64
 
 
 def transformLocation(obs, x, y):
@@ -164,17 +187,10 @@ def get_action_v3(id_action, point, obs, num_dict=None):
     unit_type = obs.observation['feature_screen'][_UNIT_TYPE]
 
     depot_y, depot_x = (unit_type == _TERRAN_SUPPLY_DEPOT).nonzero()
-    supply_depot_exist = 1 if depot_y.any() else 0
-    if not supply_depot_exist:
-        num_dict['supply_deports'] = 0
+    supply_depot_count = supply_depot_count = 1 if depot_y.any() else 0
 
     barracks_y, barracks_x = (unit_type == _TERRAN_BARRACKS).nonzero()
-    barracks_exist = 1 if barracks_y.any() else 0
-    if not barracks_exist:
-        num_dict['barracks'] = 0
-
-    engbays_y, engbays_x = (unit_type == _TERRAN_ENGINEERINGBAY).nonzero()
-    engbays_exist = 1 if engbays_y.any() else 0
+    barracks_count = 1 if barracks_y.any() else 0
 
     supply_limit = obs.observation['player'][4]
     army_supply = obs.observation['player'][5]
@@ -186,12 +202,15 @@ def get_action_v3(id_action, point, obs, num_dict=None):
     killed_building_score = obs.observation['score_cumulative'][6]
 
     current_state = np.zeros(20)
-    current_state[0] = supply_depot_exist
-    current_state[1] = barracks_exist
+    current_state[0] = supply_depot_count
+    current_state[1] = barracks_count
     current_state[2] = supply_limit
     current_state[3] = army_supply
 
     hot_squares = np.zeros(16)
+
+    army_selected = False
+    army_rallied = False
 
     if (obs.observation['feature_minimap'][_PLAYER_RELATIVE] == _PLAYER_HOSTILE).nonzero():
         enemy_y, enemy_x = (obs.observation['feature_minimap'][_PLAYER_RELATIVE] == _PLAYER_HOSTILE).nonzero()
@@ -209,7 +228,6 @@ def get_action_v3(id_action, point, obs, num_dict=None):
     # if '_' in smart_action:
     #     smart_action, x, y = smart_action.split('_')
 
-    # (obs.observation['feature_minimap'][_PLAYER_RELATIVE] == _PLAYER_HOSTILE).nonzero()
     if smart_action == ACTION_SELECT_SCV:
         unit_type = obs.observation['feature_screen'][_UNIT_TYPE]
         unit_y, unit_x = (unit_type == _TERRAN_SCV).nonzero()
@@ -237,7 +255,7 @@ def get_action_v3(id_action, point, obs, num_dict=None):
         # mineral_y, mineral_x = (unit_type == _NEUTRAL_BATTLESTATIONMINERALFIELD).nonzero()
 
         if _COLLECT_RESOURCES in obs.observation['available_actions'] and idle_workers_cnt > 0:
-            if mineral_y.any() and scv_y.any():
+            if mineral_y.any():
                 i = random.randint(0, len(scv_y) - 1)
                 # target = (mineral_y[i], mineral_y[i])
                 # target = (mineral_y.mean(), mineral_y.mean())
@@ -247,107 +265,60 @@ def get_action_v3(id_action, point, obs, num_dict=None):
                 func = actions.FunctionCall(_COLLECT_RESOURCES, [_NOT_QUEUED, target])
 
     elif smart_action == ACTION_BUILD_SUPPLY_DEPOT:
-        if _BUILD_SUPPLY_DEPOT in obs.observation['available_actions']:
+        deports_cnt = num_dict["supply_deports"]
+        if _BUILD_SUPPLY_DEPOT in obs.observation['available_actions'] and deports_cnt < 4:
             unit_type = obs.observation['feature_screen'][_UNIT_TYPE]
             unit_y, unit_x = (unit_type == _TERRAN_COMMANDCENTER).nonzero()
 
             if unit_y.any():
-                if supply_limit < 23:
+                if num_dict["supply_deports"] == 0:
                     target = (31, 8)
-                elif supply_limit < 31:
+                elif num_dict["supply_deports"] == 1:
                     target = (26, 8)
-                elif supply_limit < 39:
+                elif num_dict["supply_deports"] == 2:
                     target = (21, 8)
-                elif supply_limit < 47:
+                elif num_dict["supply_deports"] == 3:
                     target = (16, 8)
-                # else:
-                #     target = to_yx(point)
+                else:
+                    target = to_yx(point)
+
+                func = actions.FunctionCall(_BUILD_SUPPLY_DEPOT, [_NOT_QUEUED, target])
 
                 try:
-                    func = actions.FunctionCall(_BUILD_SUPPLY_DEPOT, [_NOT_QUEUED, target])
+                    num_dict["supply_deports"] += 1
                     return func, smart_action, num_dict
                 except UnboundLocalError:
-                    # print(str(smart_action) + " " + str(point) + " is not an available action")
-                    return get_action_v3(action_from_id[0], point, obs, num_dict)  # 'selectscv'
-
-    elif smart_action == ACTION_BUILD_ENGBAY:
-        engbays_cnt = num_dict["engbays"]
-
-        if _BUILD_ENG_BAY in obs.observation['available_actions'] and not engbays_exist:
-            unit_type = obs.observation['feature_screen'][_UNIT_TYPE]
-            unit_y, unit_x = (unit_type == _TERRAN_COMMANDCENTER).nonzero()
-
-            if unit_y.any():
-                # target = to_yx(point)
-                target = (38, 44)
-                func = actions.FunctionCall(_BUILD_ENG_BAY, [_NOT_QUEUED, target])
-        try:
-            # num_dict["engbays"] += 1
-            return func, smart_action, num_dict
-        except UnboundLocalError:
-            # num_dict["engbays"] -= 1
-            # print(str(smart_action) + " " + str(point) + " is not an available action")
-            return get_action_v3(action_from_id[0], point, obs, num_dict)  # 'selectscv'
-
-    elif smart_action == ACTION_BUILD_MISSLE_TURRENT:
-        missile_turrets_cnt = num_dict["missile_turrets"]
-
-        if _BUILD_MISSLE_TURRENT in obs.observation['available_actions'] and missile_turrets_cnt < 16:
-            unit_type = obs.observation['feature_screen'][_UNIT_TYPE]
-            unit_y, unit_x = (unit_type == _TERRAN_SUPPLY_DEPOT).nonzero()
-
-            if unit_y.any():
-                target = [(60, 16), (60, 26), (60, 36)]
-                if num_dict['missile_turrets'] == 0:
-                    func = actions.FunctionCall(_BUILD_MISSLE_TURRENT, [_NOT_QUEUED, target[0]])
-                elif num_dict['missile_turrets'] == 1:
-                    func = actions.FunctionCall(_BUILD_MISSLE_TURRENT, [_NOT_QUEUED, target[1]])
-                elif num_dict['missile_turrets'] == 2:
-                    func = actions.FunctionCall(_BUILD_MISSLE_TURRENT, [_NOT_QUEUED, target[2]])
-                # else:
-                #     target = to_yx(point)
-                #     func = actions.FunctionCall(_BUILD_MISSLE_TURRENT, [_NOT_QUEUED, target])
-
-        try:
-            num_dict['missile_turrets'] += 1
-            return func, smart_action, num_dict
-        except UnboundLocalError:
-            num_dict['missile_turrets'] -= 1
-            # print(str(smart_action) + " " + str(point) + " is not an available action")
-            if engbays_exist:
-                return get_action_v3(action_from_id[0], point, obs, num_dict)  # 'selectscv'
-            else:
-                return get_action_v3(action_from_id[5], point, obs,
-                                     num_dict)  # 'buildengbay'         # TODO: 无法建造导弹塔的原因不一定是因未建造工程港而未解锁，还有可能是前置动作未选择农民        # SOLVED #
+                    num_dict["supply_deports"] -= 1
+                    print(str(smart_action) + " " + str(point) + " is not an available action")
+                    return get_action_v3(action_from_id[0], point, obs, num_dict)
 
     elif smart_action == ACTION_BUILD_BARRACKS:
         if _BUILD_BARRACKS in obs.observation['available_actions']:
             unit_type = obs.observation['feature_screen'][_UNIT_TYPE]
             unit_y, unit_x = (unit_type == _TERRAN_COMMANDCENTER).nonzero()
 
-            if unit_y.any() and num_dict["barracks"] < 3:
+            if unit_y.any() and num_dict['barracks'] < 3:
                 # target = to_yx(point)
                 if num_dict["barracks"] == 0:
-                    target = (52, 18)
-                # elif num_dict["barracks"] == 1:
-                #     target = (52, 28)
-                # elif num_dict["barracks"] == 2:
-                #     target = (52, 38)
-                # else:
-                #     target = to_yx(point)
+                    target = (56, 18)
+                elif num_dict["barracks"] == 1:
+                    target = (56, 28)
+                elif num_dict["barracks"] == 2:
+                    target = (56, 38)
+                else:
+                    target = to_yx(point)
 
+                func = actions.FunctionCall(_BUILD_BARRACKS, [_NOT_QUEUED, target])
                 try:
-                    func = actions.FunctionCall(_BUILD_BARRACKS, [_NOT_QUEUED, target])
-
                     num_dict["barracks"] += 1
                     return func, smart_action, num_dict
                 except UnboundLocalError:
                     num_dict["barracks"] -= 1
-                    # print(str(smart_action) + " " + str(point) + " is not an available action")
+                    print(str(smart_action) + " " + str(point) + " is not an available action")
                     if num_dict['supply_deports'] == 0:
-                        return get_action_v3(action_from_id[1], point, obs, num_dict)  # 'buildsupplydepot'
+                        return get_action_v3(action_from_id[1], point, obs, num_dict)
                     else:
-                        return get_action_v3(action_from_id[0], point, obs, num_dict)  # 'selectscv'
+                        return get_action_v3(action_from_id[0], point, obs, num_dict)
 
     elif smart_action == ACTION_SELECT_BARRACKS:
         unit_type = obs.observation['feature_screen'][_UNIT_TYPE]
@@ -363,8 +334,8 @@ def get_action_v3(id_action, point, obs, num_dict=None):
             try:
                 return func, smart_action, num_dict
             except UnboundLocalError:
-                # print(str(smart_action) + " " + str(point) + " is not an available action")
-                return get_action_v3(action_from_id[2], point, obs, num_dict)  # 'buildbarracks'
+                print(str(smart_action) + " " + str(point) + " is not an available action")
+                return get_action_v3(action_from_id[2], point, obs, num_dict)
 
     elif smart_action == ACTION_TRAIN_MARINE:
         unit_type = obs.observation['feature_screen'][_UNIT_TYPE]
@@ -377,8 +348,8 @@ def get_action_v3(id_action, point, obs, num_dict=None):
             return func, smart_action, num_dict
         except UnboundLocalError:
             # num_dict["marines"] -= 1
-            # print(str(smart_action) + " " + str(point) + " is not an available action")
-            return get_action_v3(action_from_id[3], point, obs, num_dict)  # 'selectbarracks'
+            print(str(smart_action) + " " + str(point) + " is not an available action")
+            return get_action_v3(action_from_id[3], point, obs, num_dict)
 
     elif smart_action == ACTION_SELECT_ARMY:
         if _SELECT_ARMY in obs.observation['available_actions']:
@@ -386,37 +357,105 @@ def get_action_v3(id_action, point, obs, num_dict=None):
         try:
             return func, smart_action, num_dict
         except UnboundLocalError:
-            # print(str(smart_action) + " " + str(point) + " is not an available action")
-            return get_action_v3(action_from_id[4], point, obs, num_dict)  # 'buildmarine'
+            print(str(smart_action) + " " + str(point) + " is not an available action")
+            return get_action_v3(action_from_id[4], point, obs, num_dict)
 
     elif smart_action == ACTION_ATTACK:
         enemy_y, enemy_x = (obs.observation['feature_minimap'][_PLAYER_RELATIVE] == _PLAYER_HOSTILE).nonzero()
 
         if (obs.observation['feature_minimap'][_PLAYER_RELATIVE] == _PLAYER_HOSTILE).nonzero():  # 攻击已知敌人
+            # for i in range(0, len(enemy_y)):
+            # marines_cnt = num_dict["marines"]
 
-            if len(obs.observation['multi_select']) and army_cnt > 8:
+            if len(obs.observation['multi_select']) and army_cnt > 12 and num_dict['attack_cnt'] < 2:
+                # if obs.observation['multi_select'][0][0] != _TERRAN_SCV and _ATTACK_MINIMAP in obs.observation["available_actions"]:
                 if _ATTACK_MINIMAP in obs.observation["available_actions"]:
                     # if _ATTACK_MINIMAP in obs.observation["available_actions"]:
                     if enemy_y.any():
-                        # target = [int(np.random.choice(enemy_x)), int(np.random.choice(enemy_y))]
-                        target = to_yx(point)           # TODO:
+                        target = [int(np.random.choice(enemy_x)), int(np.random.choice(enemy_y))]
+                        # target = to_yx(point)           # TODO:
                         func = actions.FunctionCall(_ATTACK_MINIMAP, [_NOT_QUEUED, target])
                         # num_dict['marines'] = 0
+                        num_dict['attack_cnt'] += 1
+            elif num_dict['attack_cnt'] >= 2 and len(obs.observation['multi_select']) and army_cnt >= 3:
+                    # if obs.observation['multi_select'][0][0] != _TERRAN_SCV and _ATTACK_MINIMAP in obs.observation["available_actions"]:
+                    if _ATTACK_MINIMAP in obs.observation["available_actions"]:
+                        # if _ATTACK_MINIMAP in obs.observation["available_actions"]:
+                        if enemy_y.any():
+                            target = [int(np.random.choice(enemy_x)), int(np.random.choice(enemy_y))]
+                            # target = to_yx(point)           # TODO:
+                            func = actions.FunctionCall(_ATTACK_MINIMAP, [_NOT_QUEUED, target])
+                            # num_dict['marines'] = 0
+                            num_dict['attack_cnt'] += 1
+            # else:
+            #     if len(obs.observation['multi_select']):
+            #         # if obs.observation['multi_select'][0][0] != _TERRAN_SCV and _ATTACK_MINIMAP in obs.observation["available_actions"]:
+            #         if _ATTACK_MINIMAP in obs.observation["available_actions"]:
+            #             # if _ATTACK_MINIMAP in obs.observation["available_actions"]:
+            #             if enemy_y.any():
+            #                 target = [int(np.random.choice(enemy_x)), int(np.random.choice(enemy_y))]
+            #                 # target = to_yx(point)           # TODO:
+            #                 func = actions.FunctionCall(_ATTACK_MINIMAP, [_NOT_QUEUED, target])
+            #                 # num_dict['marines'] = 0
+            #                 num_dict['attack_cnt'] += 1
         else:  # 攻击任意位置（未找到敌人时，类似巡逻）
             if len(obs.observation['multi_select']):
+                # if obs.observation['multi_select'][0][0] != _TERRAN_SCV and _ATTACK_MINIMAP in obs.observation["available_actions"]:
                 if _ATTACK_MINIMAP in obs.observation["available_actions"]:
                     target = to_yx(point)
                     func = actions.FunctionCall(_ATTACK_MINIMAP, [_NOT_QUEUED, target])
         try:
-            num_dict['attack_cnt'] += 1
             return func, smart_action, num_dict
         except UnboundLocalError:
             num_dict['attack_cnt'] -= 1
-            # print(str(smart_action) + " " + str(point) + " is not an available action")
-            if army_cnt < 8:
-                return get_action_v3(action_from_id[4], point, obs, num_dict)  # 'buildmarine'
-            else:
-                return get_action_v3(action_from_id[7], point, obs, num_dict)   # 'select_army'
+            print(str(smart_action) + " " + str(point) + " is not an available action")
+            return get_action_v3(action_from_id[4], point, obs, num_dict)
+
+    elif smart_action == ACTION_BUILD_ENGBAY:
+        engbays_cnt = num_dict["engbays"]
+
+        if _BUILD_ENG_BAY in obs.observation['available_actions'] and engbays_cnt == 0:
+            unit_type = obs.observation['feature_screen'][_UNIT_TYPE]
+            unit_y, unit_x = (unit_type == _TERRAN_COMMANDCENTER).nonzero()
+
+            if unit_y.any():
+                # target = to_yx(point)
+                target = (38, 44)
+                func = actions.FunctionCall(_BUILD_ENG_BAY, [_NOT_QUEUED, target])
+        try:
+            num_dict["engbays"] += 1
+            return func, smart_action, num_dict
+        except UnboundLocalError:
+            num_dict["engbays"] -= 1
+            print(str(smart_action) + " " + str(point) + " is not an available action")
+            return get_action_v3(action_from_id[0], point, obs, num_dict)
+
+    elif smart_action == ACTION_BUILD_MISSLE_TURRENT:
+        missile_turrets_cnt = num_dict["missile_turrets"]
+
+        if _BUILD_MISSLE_TURRENT in obs.observation['available_actions'] and missile_turrets_cnt < 16:
+            unit_type = obs.observation['feature_screen'][_UNIT_TYPE]
+            unit_y, unit_x = (unit_type == _TERRAN_SUPPLY_DEPOT).nonzero()
+
+            if unit_y.any():
+                target = [(62, 16), (62, 26), (62, 36)]
+                if num_dict['missile_turrets'] == 0:
+                    func = actions.FunctionCall(_BUILD_MISSLE_TURRENT, [_NOT_QUEUED, target[0]])
+                elif num_dict['missile_turrets'] == 1:
+                    func = actions.FunctionCall(_BUILD_MISSLE_TURRENT, [_NOT_QUEUED, target[1]])
+                elif num_dict['missile_turrets'] == 2:
+                    func = actions.FunctionCall(_BUILD_MISSLE_TURRENT, [_NOT_QUEUED, target[2]])
+                else:
+                    target = to_yx(point)
+                    func = actions.FunctionCall(_BUILD_MISSLE_TURRENT, [_NOT_QUEUED, target])
+
+        try:
+            num_dict['missile_turrets'] += 1
+            return func, smart_action, num_dict
+        except UnboundLocalError:
+            num_dict['missile_turrets'] -= 1
+            print(str(smart_action) + " " + str(point) + " is not an available action")
+            return get_action_v3(action_from_id[5], point, obs, num_dict)
 
     elif smart_action == ACTION_DO_NOTHING:
         func = actions.FunctionCall(_NO_OP, [])
@@ -425,12 +464,11 @@ def get_action_v3(id_action, point, obs, num_dict=None):
         return func, smart_action, num_dict
 
     except UnboundLocalError:
-        # print(str(smart_action) + " " + str(point) + " is not an available action")
+        print(str(smart_action) + " " + str(point) + " is not an available action")
         return actions.FunctionCall(_NO_OP, []), ACTION_DO_NOTHING, num_dict
 
 
 def main(unused_argv):
-    # TODO: save replay not working ...
 
     viz = True
     replay_prefix = 'D:/software/python_prj/SCII/SCII_Bots/replays/deterministic_sequence'
@@ -440,12 +478,7 @@ def main(unused_argv):
     disable_fog = True
     steps_per_episode = 0  # 0 actually means unlimited
     MAX_EPISODES = 1
-    MAX_STEPS = 300000
-    train_mode = True           # True  False
-    if train_mode == True:
-        MAX_EPISODES = 1000
-    else:
-        MAX_EPISODES = 1
+    MAX_STEPS = 5000
     try:
         # run trajectories and train
         with sc2_env.SC2Env(
@@ -464,37 +497,25 @@ def main(unused_argv):
                 realtime=real_time,
                 ensure_available_actions=ensure_available_actions,
                 disable_fog=disable_fog,
-                # save_replay_episodes=1,
-                # replay_prefix=replay_prefix,
-                # replay_dir=replay_dir,
+                save_replay_episodes=1,
+                replay_prefix=replay_prefix,
+                replay_dir=replay_dir,
         ) as env:
 
             done = False
-            dataset = []
+            history = []
 
-            max_batch_pool_in_last_play = 0
-            max_episode_in_last_play = 0
-
-            path_lst = os.listdir('./save/dqn')
-            if len(path_lst) != 0:
-                max_episode_in_last_play = max([int(p.split('.')[0].split('i')[-1].split('-')[0]) for p in path_lst])
-                load_path = Path(Path(os.getcwd()) / 'save' / 'dqn' / 'Simple64-dqn-epi{}.pt'.format(max_episode_in_last_play))
-            else:
-                load_path = 'none'
-            algo = q_learning.DeepQLearning(load_path)
-
-            logs_path_lst = os.listdir('./logs/history_data')
-            if len(logs_path_lst) != 0:
-                max_batch_pool_in_last_play = max([int(os.listdir('./logs/history_data')[p].split('p')[-2].split('.')[0].split('_')[0]) for p in range(len(logs_path_lst))])
-            batch_pool_idx = max_batch_pool_in_last_play + 1
-            losses_lst = []
-            for e in range(max_episode_in_last_play+1, max_episode_in_last_play+MAX_EPISODES+1):
-                if e > 0:
-                    obs = env.reset()
+            for e in range(MAX_EPISODES):
+                obs = env.reset()
 
                 score = 0
+                score_pre = 0
+                state = get_state(obs[0])
 
-                num_dict = {"workers": 0, "idle_workers": 0, "barracks": 0, "engbays": 0,
+                control_seq = []
+                control_idx = 1
+
+                num_dict = {"workers": 0, "idle_workers": 0, "supply_deports": 0, "barracks": 0, "engbays": 0,
                             # "marines": 0,
                             "missile_turrets": 0, 'attack_cnt': 0}
                 for time in range(MAX_STEPS):
@@ -502,100 +523,63 @@ def main(unused_argv):
                     if e == 0 and time == 0:
                         init = True
 
-                    state_model = [np.array(obs[0].observation.feature_screen),
-                                   np.array(obs[0].observation.feature_minimap), np.array(obs[0].observation.player)]
-                    # TODO: state_model = [np.array(obs[0].observation.feature_screen), np.array(obs[0].observation.feature_minimap), np.array(obs[0].observation.player), np.array(obs[0].observation.last_actions)]
-
-                    preds = algo.choose_action_v(state_model, init)
-
-                    action, point = action_from_id[np.argmax(preds[0].detach().cpu().numpy())], \
-                                    [i for i in range(4096)][np.argmax(preds[1].detach().cpu().numpy())]
-                    func, actual_action, new_num_dict = get_action_v3(action, point, obs=obs[0], num_dict=num_dict)
+                    a, point = action_from_id[np.random.choice(len(action_from_id), 1)[0]], np.random.randint(4096)
+                    # # TODO: build supply deport with deterministic time sequence
+                    # point = np.random.randint(4096)
+                    # a = action_from_id[control_idx]
+                    # # control_seq.append(action_from_id[control_idx])
+                    # control_seq.append(action_from_id[control_idx+1])
+                    # if len(control_seq) > 0:
+                    #     a = control_seq[-1]
+                    func, act_a, new_num_dict = get_action_v3(a, point, obs=obs[0], num_dict=num_dict)
+                    # if act_a == a:
+                    #     control_seq.pop()
+                    #     control_idx += 1
 
                     next_obs = env.step([func])
+                    print(act_a, point)
 
                     next_state = get_state(next_obs[0])
                     num_dict = new_num_dict
-                    state_model_next = [np.array(obs[0].observation.feature_screen),
-                                        np.array(obs[0].observation.feature_minimap),
-                                        np.array(obs[0].observation.player)]
 
-                    # reward_a = float(next_obs[0].observation.score_cumulative[11]) * 10e-2          # spent_minerals
-                    reward_a = float(next_obs[0].observation.score_cumulative[3])        # total_value_units
-                    reward_p = float(next_obs[0].observation.score_cumulative[5] + next_obs[0].observation.score_cumulative[6])  # next_obs[0].observation.score_cumulative[5], [6]: 'killed_value_units' (2745642291968)，'killed_value_structures' (2745642292040)
-
-                    if actual_action == action:
-                        reward_a = reward_a * 10
-                    reward = [reward_a, reward_p]
-
-                    last_action = obs[0].observation.last_actions
+                    reward = float(next_obs[0].reward) + float(np.sum(next_obs[0].observation.score_cumulative)) * 10e-8
 
                     if env._controllers and env._controllers[0].status.value != 3:
                         done = True
-                        print("episode: {}/{}, score: {}".format(e, max_episode_in_last_play+MAX_EPISODES, score))
-
-                        if env._obs[0].player_result[0].result == 1:  # player0(unknown)胜利
-                            reward = list(np.array(reward) + 10000)
-                            # for k in range(len(dataset)):
-                            #     dataset[k][8] = list(np.array([np.array(dataset[i][8]) for i in range(len(dataset))]) * 100)[k]
-                        elif env._obs[0].player_result[0].result == 2:  # player0(unknown)战败
-                            reward = list(np.array(reward) - 10000)
-                            # for k in range(len(dataset)):
-                            #     dataset[k][8] = list(np.array([np.array(dataset[i][8]) for i in range(len(dataset))]) / 100)[k]
-
                     if time == MAX_STEPS - 1:
                         done = True
-                    score += reward_a
-
-                    if done:
-                        reward = list(np.array(reward) - 5000)
-                        dataset.append(
-                            [e, time, state_model, state_model_next, action, actual_action, last_action, point, reward,
-                             score, done]
-                        )
-                        num_dict["barracks"] = 0
-
-                        done = False
-
-                        if train_mode:
-                            algo.copy()
-                        break
-
-                    dataset.append(
-                        [e, time, state_model, state_model_next, action, actual_action, last_action, point, reward,
-                         score, done]
-                    )
-                    if len(dataset) >= 256:  # TODO: HOW TO LEARN ??
-                        if train_mode:
-                            loss_per_batch = algo.learn(dataset, id_from_actions)
-                            losses_lst.append(np.mean(loss_per_batch))
-                            print('episode:   ', e, '    critic_network_loss', loss_per_batch)
-                        if e % 10 == 0:
-                            # 保存为pickle文件
-                            with open('./logs/history_data/history_dqn_sequence_bp{}_score{}.pkl'.format(str(batch_pool_idx), str(score)), "wb") as f:
-                                pickle.dump(np.array(dataset), f)
-                        dataset = []
-                        batch_pool_idx += 1
 
                     state = next_state
                     obs = next_obs
+                    if done:
+                        print("episode: {}/{}, score: {}".format(e, MAX_EPISODES, score))
+                        if score_pre < score:
+                            score_pre = score
 
-                if train_mode:
-                    save_path = './save/dqn/Simple64-dqn-epi{}-score{}.pt'.format(e, score)
-                    algo.save(save_path)
+                        done = False
+                        break
 
-            if train_mode:
-                plt.plot(losses_lst)
-                plt.savefig('./logs/train_process/train_process_dqn_{}_to_{}'.format(max_episode_in_last_play+1, max_episode_in_last_play+MAX_EPISODES+1))
-                plt.show()
+                    if time % 10 == 0:
+                        if score_pre < score:
+                            # save agent model
+                            history.append(
+                                [e, time, state, next_state, a, act_a, point, reward, score, done]
+                            )
 
-                pd.DataFrame(losses_lst).to_csv('./logs/train_process/losses_lst.csv')
+                    score += reward
+
+                    time += 1
+                history_arr = np.array(history)
+                # np.savez_compressed('./logs/history_deterministic_sequence_{}.npz'.format(str(e)), history_arr)
     except KeyboardInterrupt:
         pass
+    # finally:
+    #     elapsed_time = time.time() - start_time
+    #     print("Took %.3f seconds for %s steps: %.3f fps" % (
+    #         elapsed_time, total_frames, total_frames / elapsed_time))
 
 
 if __name__ == '__main__':
     app.run(main)
-    pass
-
     # TODO: git merge not work!!
+
