@@ -329,10 +329,10 @@ def get_action_v3(id_action, point, obs, num_dict=None):
                 # target = to_yx(point)
                 if num_dict["barracks"] == 0:
                     target = (52, 18)
-                elif num_dict["barracks"] == 1:
-                    target = (52, 28)
-                elif num_dict["barracks"] == 2:
-                    target = (52, 38)
+                # elif num_dict["barracks"] == 1:
+                #     target = (52, 28)
+                # elif num_dict["barracks"] == 2:
+                #     target = (52, 38)
                 # else:
                 #     target = to_yx(point)
 
@@ -464,9 +464,9 @@ def main(unused_argv):
                 realtime=real_time,
                 ensure_available_actions=ensure_available_actions,
                 disable_fog=disable_fog,
-                save_replay_episodes=1,
-                replay_prefix=replay_prefix,
-                replay_dir=replay_dir,
+                # save_replay_episodes=1,
+                # replay_prefix=replay_prefix,
+                # replay_dir=replay_dir,
         ) as env:
 
             done = False

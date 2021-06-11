@@ -133,11 +133,13 @@ python runner_a2c.py
 
 ##### details of neural agent
 
-The structure of **DQN** neural agent is constructed as follows with pytorch 1.2.0.
+The structure of **neural agent** can be trained through **DQN** algorithm is constructed as follows with pytorch 1.2.0. The [DQN algorithm](https://zhuanlan.zhihu.com/p/97856004) is expressed as follows.
+
+<img src="assets\dqn_algo.png" style="zoom:36%"/>
 
 The neural network model takes three different types of input tensors include 27 channels screen features, 11channels mini-map features and 11 channels player information features. 
 
-Also, two different functional models, named as operation model and warfare model, shared several layers of the whole network and the inputs. And the two models output action value and value of attack position respectively.
+Also, two different functional models, named as **operation model** and **warfare model**, shared several layers of the whole network and the inputs. The two models output action value and value of attack position respectively.
 
 <img src="assets\dqnagent-1621745942426.png" style="zoom:15%"/>
 
@@ -155,7 +157,7 @@ It costs much time but the agent does learn something like:
 
 -  The most important, the agent has learned about how to  select army and attack (select_scv-->build_supply_deport-->build_barrack-->train marines in multiple times-->select_all_troops-->attack_point). 
 -  learned to train new battle units when army is losing. 
-- learning to attack specific position
+- learning to attack specific position.
 
 
 
