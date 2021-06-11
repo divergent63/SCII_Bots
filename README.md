@@ -161,7 +161,7 @@ Build value neural agent to learn high-value action based on DQN algorithm, curr
 
  Best score in one episode: 8339872.5. Average learning losses after 1068 batch_pools. 
 
-![image-20210608150500854](assets\image-20210608150500854.png)
+<img src="assets/image-20210608150500854.png" style="zoom:100%"/>
 
 And finally,
 
