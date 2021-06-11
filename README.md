@@ -143,9 +143,7 @@ The [DQN algorithm](https://zhuanlan.zhihu.com/p/97856004) is expressed as follo
 
 <img src="assets\dqn_algo.png" style="zoom:36%"/>
 
-
-
-The structure of **policy neural agent** is constructed as follows with pytorch 1.2.0. Try to use **A2C** algorhthm to search better policy distribution (**Coming soon**).
+The structure of **policy neural agent** is constructed as follows with pytorch 1.2.0. Try to use **A2C** algorhthm to search better policy distribution (**Coming Soon**).
 
 <img src="assets/a2cagent-1621745942426.png" style="zoom:10%"/>
 
@@ -153,15 +151,15 @@ The structure of **policy neural agent** is constructed as follows with pytorch 
 
 ### evaluating
 
-It costs much time but the agent does learn something like:
+Build value neural agent to learn high-value action based on DQN algorithm, currently the state of convergence as follows:
 
 -  The most important, the agent has learned available action sequence like how to select army and attack (select_scv-->build_supply_deport-->build_barrack-->train marines in multiple times-->select_all_troops-->reach to attack_point and attack);
--  learned to train new battle units when army is losing, build around 10 marines in each attack wave;
-- learning to attack specific position.
+-  available to train new battle units when army is losing, build around 10 marines in each attack wave;
+- available to attack specific position.
 
 
 
- Average learning losses after 1068 batch_pools. 
+ Best score in one episode: 8339872.5. Average learning losses after 1068 batch_pools. 
 
 ![image-20210608150500854](assets\image-20210608150500854.png)
 
