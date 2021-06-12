@@ -95,8 +95,6 @@ reward = list(np.array(reward) + 10000)
 reward = list(np.array(reward) - 5000)
 ```
 
-
-
 ------
 
 Run the environment test script as follows with
@@ -107,19 +105,17 @@ python runner_basic_test.py
 
 ------
 
-Train an DQN agent to play the game with 
-
-```powershell
-python runner_dqn.py
-```
-
 I also use the supervised value network to validate if the gradient update is worked, just run with
 
 ```python
 python runner_nn_test.py
 ```
 
+Train an DQN agent to play the game with 
 
+```powershell
+python runner_dqn.py
+```
 
 ------
 
