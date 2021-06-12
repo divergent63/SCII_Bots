@@ -131,7 +131,7 @@ python runner_a2c.py
 
 
 
-##### details of neural agent
+##### details of neural agents and algorithms
 
 The structure of **value neural agent** can be trained through **DQN** algorithm. The value neural agent takes three different types of input tensors include 27 channels screen features, 11channels mini-map features and 11 channels player information features. 
 
@@ -157,15 +157,19 @@ Build value neural agent to learn high-value action based on DQN algorithm, curr
 -  available to train new battle units when army is losing, build around 10 marines in each attack wave;
 - available to attack specific position.
 
-
-
- Best score in one episode: 8339872.5. Average learning losses after 1068 batch_pools. 
+Several replays are saved in [here](https://github.com/divergent63/SCII_Bots/tree/main/replays). Best score in one episode: 8339872.5. Average learning losses after 1068 batch_pools. 
 
 <img src="assets/image-20210608150500854.png" style="zoom:98%"/>
 
 And finally,
 
+<u>***En Taro Adun !!!***</u>
+
+<u>***En Taro Tassadar !!!***</u>
+
 <u>***En Taro Zeratul !!!***</u>
+
+<u>***En Taro Artanis !!!***</u>
 
 
 
