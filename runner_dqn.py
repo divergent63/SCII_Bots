@@ -575,7 +575,7 @@ def main(unused_argv):
                         [e, time, state_model, state_model_next, action, actual_action, last_action, point, reward,
                          score, done]
                     )
-                    if len(dataset) >= 256:  # HOW TO LEARN
+                    if len(dataset) >= 512:  # HOW TO LEARN
                         if train_mode:
                             loss_per_batch = algo.learn(dataset, id_from_actions)
                             losses_lst.append(np.mean(loss_per_batch))

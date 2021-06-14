@@ -1,5 +1,5 @@
 # SCII_Bots
-<img src="assets/BC.jpg" style="zoom:100%"/>
+<img src="assets/title_page.png" style="zoom:100%"/>
 
 Several agents able to play *[StarCraft II]((https://starcraft2.com/))* will be built in this repository!
 

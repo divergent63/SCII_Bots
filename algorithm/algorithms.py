@@ -188,7 +188,7 @@ class DeepQLearning:
             return v
 
     def learn(self, history_raw, id_from_actions, epochs=3):
-        batch_size = len(history_raw) // 4
+        batch_size = len(history_raw) // 16
         critic_network_loss_lst = []
         # history_raw: [e, time, state_model, state_model_next, action, actual_action, last_action, point, reward, score, done]
         for epoch in range(epochs):
@@ -243,12 +243,12 @@ class DeepQLearning:
             # values = model_critic([states_var_screen, states_var_minimap, states_var_player])
             critic_network_loss = self.criterion(q_predict[0], target_values) + self.criterion(q_predict[1],
                                                                                                target_values_p)  # + criterion(q_predict[1], target_values)
-            print('epoch:  ', epoch, '  critic_network_loss:  \n', critic_network_loss, '\n')
+            # print('epoch:  ', epoch, '  critic_network_loss:  \n', critic_network_loss, '\n')
             critic_network_loss_lst.append(float(critic_network_loss.detach().cpu().numpy()))
 
             self.critic_optim.zero_grad()
             critic_network_loss.backward()
-            # torch.nn.utils.clip_grad_norm(self.model.parameters(), 0.5)
+            torch.nn.utils.clip_grad_norm(self.model.parameters(), 0.5)
             self.critic_optim.step()
         return critic_network_loss_lst
 
