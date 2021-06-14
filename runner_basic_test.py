@@ -21,9 +21,6 @@ from sc2.constants import NEXUS, PROBE, PYLON, ASSIMILATOR, GATEWAY, \
     CYBERNETICSCORE, STALKER, STARGATE, VOIDRAY, OBSERVER, ROBOTICSFACILITY
 # from terran_agent import TerranAgent
 
-import models.models as models
-import algorithms.q_learning as q_learning
-
 from pathlib import Path
 from absl import app, logging, flags
 

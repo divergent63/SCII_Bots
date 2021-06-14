@@ -6,8 +6,8 @@ from pysc2.lib import actions, features, units
 from pysc2.env import sc2_env, run_loop, available_actions_printer
 from pysc2 import maps
 
-import models.models as models
-import algorithms.q_learning as q_learning
+import model.models as models
+import algorithm.algorithms as ALGO
 
 from pathlib import Path
 from absl import app, logging, flags
@@ -176,6 +176,11 @@ def get_action_v3(id_action, point, obs, num_dict=None):
     engbays_y, engbays_x = (unit_type == _TERRAN_ENGINEERINGBAY).nonzero()
     engbays_exist = 1 if engbays_y.any() else 0
 
+    turrent_y, turrent_x = (unit_type == _MissileTurret).nonzero()
+    missile_turrets_exist = 1 if turrent_y.any() else 0
+    if not missile_turrets_exist:
+        num_dict['missile_turrets'] = 0
+
     supply_limit = obs.observation['player'][4]
     army_supply = obs.observation['player'][5]
     food_workers = obs.observation['player'][6]
@@ -292,7 +297,7 @@ def get_action_v3(id_action, point, obs, num_dict=None):
     elif smart_action == ACTION_BUILD_MISSLE_TURRENT:
         missile_turrets_cnt = num_dict["missile_turrets"]
 
-        if _BUILD_MISSLE_TURRENT in obs.observation['available_actions'] and missile_turrets_cnt < 16:
+        if _BUILD_MISSLE_TURRENT in obs.observation['available_actions'] and missile_turrets_cnt < 4:
             unit_type = obs.observation['feature_screen'][_UNIT_TYPE]
             unit_y, unit_x = (unit_type == _TERRAN_SUPPLY_DEPOT).nonzero()
 
@@ -329,10 +334,10 @@ def get_action_v3(id_action, point, obs, num_dict=None):
                 # target = to_yx(point)
                 if num_dict["barracks"] == 0:
                     target = (52, 18)
-                # elif num_dict["barracks"] == 1:
-                #     target = (52, 28)
                 # elif num_dict["barracks"] == 2:
-                #     target = (52, 38)
+                #     target = (52, 28)
+                elif num_dict["barracks"] == 1:
+                    target = (52, 38)
                 # else:
                 #     target = to_yx(point)
 
@@ -432,6 +437,7 @@ def get_action_v3(id_action, point, obs, num_dict=None):
 def main(unused_argv):
     # TODO: save replay not working ...
 
+    scaling_factor = 10e-2
     viz = True
     replay_prefix = 'D:/software/python_prj/SCII/SCII_Bots/replays/deterministic_sequence'
     replay_dir = '/replays'
@@ -443,7 +449,7 @@ def main(unused_argv):
     MAX_STEPS = 300000
     train_mode = True           # True  False
     if train_mode == True:
-        MAX_EPISODES = 1000
+        MAX_EPISODES = 2
     else:
         MAX_EPISODES = 1
     try:
@@ -475,13 +481,13 @@ def main(unused_argv):
             max_batch_pool_in_last_play = 0
             max_episode_in_last_play = 0
 
-            path_lst = os.listdir('./save/dqn')
+            path_lst = os.listdir('./saves/dqn')
             if len(path_lst) != 0:
                 max_episode_in_last_play = max([int(p.split('.')[0].split('i')[-1].split('-')[0]) for p in path_lst])
-                load_path = Path(Path(os.getcwd()) / 'save' / 'dqn' / 'Simple64-dqn-epi{}.pt'.format(max_episode_in_last_play))
+                load_path = Path(Path(os.getcwd()) / 'saves' / 'dqn' / 'Simple64-dqn-epi{}.pt'.format(max_episode_in_last_play))
             else:
                 load_path = 'none'
-            algo = q_learning.DeepQLearning(load_path)
+            algo = ALGO.DeepQLearning(load_path)
 
             logs_path_lst = os.listdir('./logs/history_data')
             if len(logs_path_lst) != 0:
@@ -506,7 +512,11 @@ def main(unused_argv):
                                    np.array(obs[0].observation.feature_minimap), np.array(obs[0].observation.player)]
                     # TODO: state_model = [np.array(obs[0].observation.feature_screen), np.array(obs[0].observation.feature_minimap), np.array(obs[0].observation.player), np.array(obs[0].observation.last_actions)]
 
-                    preds = algo.choose_action_v(state_model, init)
+                    if e < e * 0.4:
+                        e_greedy = 0.8
+                    else:
+                        e_greedy = 0.2
+                    preds = algo.choose_action_v(state_model, init, e_greedy)
 
                     action, point = action_from_id[np.argmax(preds[0].detach().cpu().numpy())], \
                                     [i for i in range(4096)][np.argmax(preds[1].detach().cpu().numpy())]
@@ -521,8 +531,8 @@ def main(unused_argv):
                                         np.array(obs[0].observation.player)]
 
                     # reward_a = float(next_obs[0].observation.score_cumulative[11]) * 10e-2          # spent_minerals
-                    reward_a = float(next_obs[0].observation.score_cumulative[3])        # total_value_units
-                    reward_p = float(next_obs[0].observation.score_cumulative[5] + next_obs[0].observation.score_cumulative[6])  # next_obs[0].observation.score_cumulative[5], [6]: 'killed_value_units' (2745642291968)，'killed_value_structures' (2745642292040)
+                    reward_a = float(next_obs[0].observation.score_cumulative[3]) * scaling_factor        # total_value_units
+                    reward_p = float(next_obs[0].observation.score_cumulative[5] + next_obs[0].observation.score_cumulative[6]) * scaling_factor  # next_obs[0].observation.score_cumulative[5], [6]: 'killed_value_units' (2745642291968)，'killed_value_structures' (2745642292040)
 
                     if actual_action == action:
                         reward_a = reward_a * 10
@@ -535,11 +545,11 @@ def main(unused_argv):
                         print("episode: {}/{}, score: {}".format(e, max_episode_in_last_play+MAX_EPISODES, score))
 
                         if env._obs[0].player_result[0].result == 1:  # player0(unknown)胜利
-                            reward = list(np.array(reward) + 10000)
+                            reward = list(np.array(np.array(reward) + 10000) * scaling_factor)
                             # for k in range(len(dataset)):
                             #     dataset[k][8] = list(np.array([np.array(dataset[i][8]) for i in range(len(dataset))]) * 100)[k]
                         elif env._obs[0].player_result[0].result == 2:  # player0(unknown)战败
-                            reward = list(np.array(reward) - 10000)
+                            reward = list(np.array(np.array(reward) - 10000) * scaling_factor)
                             # for k in range(len(dataset)):
                             #     dataset[k][8] = list(np.array([np.array(dataset[i][8]) for i in range(len(dataset))]) / 100)[k]
 
@@ -548,7 +558,7 @@ def main(unused_argv):
                     score += reward_a
 
                     if done:
-                        reward = list(np.array(reward) - 5000)
+                        reward = list(np.array(np.array(reward) - 5000) * scaling_factor)
                         dataset.append(
                             [e, time, state_model, state_model_next, action, actual_action, last_action, point, reward,
                              score, done]
@@ -565,7 +575,7 @@ def main(unused_argv):
                         [e, time, state_model, state_model_next, action, actual_action, last_action, point, reward,
                          score, done]
                     )
-                    if len(dataset) >= 256:  # TODO: HOW TO LEARN ??
+                    if len(dataset) >= 256:  # HOW TO LEARN
                         if train_mode:
                             loss_per_batch = algo.learn(dataset, id_from_actions)
                             losses_lst.append(np.mean(loss_per_batch))
@@ -581,7 +591,7 @@ def main(unused_argv):
                     obs = next_obs
 
                 if train_mode:
-                    save_path = './save/dqn/Simple64-dqn-epi{}-score{}.pt'.format(e, score)
+                    save_path = './saves/dqn/Simple64-dqn-epi{}-score{}.pt'.format(e, score)
                     algo.save(save_path)
 
             if train_mode:

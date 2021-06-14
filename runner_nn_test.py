@@ -21,8 +21,8 @@ from sc2.constants import NEXUS, PROBE, PYLON, ASSIMILATOR, GATEWAY, \
     CYBERNETICSCORE, STALKER, STARGATE, VOIDRAY, OBSERVER, ROBOTICSFACILITY
 # from terran_agent import TerranAgent
 
-import models.models as models
-import algorithms.q_learning as q_learning
+import model.models as models
+import algorithm.algorithms as ALGO
 
 from pathlib import Path
 from absl import app, logging, flags
@@ -511,7 +511,7 @@ def main(unused_argv):
             score = 0
             score_pre = 0
             state = get_state(obs[0])
-            algo = q_learning.DeepQLearning(action_from_id.values(), obs)
+            algo = ALGO.DeepQLearning(action_from_id.values(), obs)
 
             for e in range(MAX_EPISODES):
                 if e > 0:
