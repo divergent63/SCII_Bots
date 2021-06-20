@@ -1,7 +1,7 @@
 # SCII_Bots
 <img src="assets/title_page.png" style="zoom:100%"/>
 
-Several agents able to play *[StarCraft II]((https://starcraft2.com/))* will be built in this repository!
+Several agents able to play *[StarCraft II](https://starcraft2.com/)* will be built in this repository!
 
 [![Page Views Count](https://badges.toozhao.com/badges/01F833NA99KNWK5C43EVY472CG/orange.svg)](https://badges.toozhao.com/stats/01F833NA99KNWK5C43EVY472CG "Get your own page views count badge on badges.toozhao.com")
 
